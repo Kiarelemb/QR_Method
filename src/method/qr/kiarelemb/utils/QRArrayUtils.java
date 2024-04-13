@@ -453,7 +453,7 @@ public class QRArrayUtils {
         for (int i = child.length - 1; i >= 0; i--) {
             String last = child[i];
             int lastIndex = parent.length - 1;
-            if (objectIndexOf(parent, last,0) == lastIndex) {
+            if (objectIndexOf(parent, last, 0) == lastIndex) {
                 lastIndex--;
                 for (int j = i - 1; j >= 0 && lastIndex >= 0; j--, lastIndex--) {
                     if (!Objects.equals(parent[lastIndex], child[j])) {
@@ -464,6 +464,18 @@ public class QRArrayUtils {
             }
         }
         return false;
+    }
+
+    /**
+     * 摘自 ArrayUtils。
+     * 从 {@code 0} 开始，查找数组中给定对象的索引。如果输入数组为空，此方法返回 {@code -1}。
+     *
+     * @param array        要搜索对象的数组，可能为 {@code null}
+     * @param objectToFind 要查找的对象，可能为 {@code null}
+     * @return 数组中从索引开始的对象的索引，如果未找到或数组输入为空，则为 {@code -1}
+     */
+    public static int objectIndexOf(final Object[] array, final Object objectToFind) {
+        return objectIndexOf(array, objectToFind, 0);
     }
 
     /**
@@ -496,6 +508,32 @@ public class QRArrayUtils {
             }
         }
         return -1;
+    }
+
+    /**
+     * 集合内容比较，摘自 ListUtils
+     *
+     * @param list1 the first list, may be null
+     * @param list2 the second list, may be null
+     * @return whether the lists are equal by value comparison
+     */
+    public static boolean isEqualList(final Collection<?> list1, final Collection<?> list2) {
+        if (list1 == list2) {
+            return true;
+        }
+        if (list1 == null || list2 == null || list1.size() != list2.size()) {
+            return false;
+        }
+        final Iterator<?> it1 = list1.iterator();
+        final Iterator<?> it2 = list2.iterator();
+        while (it1.hasNext() && it2.hasNext()) {
+            Object obj1 = it1.next();
+            Object obj2 = it2.next();
+            if (!Objects.equals(obj1, obj2)) {
+                return false;
+            }
+        }
+        return !it1.hasNext() && !it2.hasNext();
     }
 
     /**
