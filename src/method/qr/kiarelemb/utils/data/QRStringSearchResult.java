@@ -1,6 +1,8 @@
 package method.qr.kiarelemb.utils.data;
 
-public class QRStringSearchResult {
+import java.io.Serializable;
+
+public class QRStringSearchResult implements Serializable {
 	private final int index;
 	private final String keyword;
 

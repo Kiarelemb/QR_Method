@@ -1,9 +1,10 @@
 package method.qr.kiarelemb.utils.data;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-public class QRRestDayData {
+public class QRRestDayData implements Serializable {
     private final int year;
     private final int month;
     private final int day;

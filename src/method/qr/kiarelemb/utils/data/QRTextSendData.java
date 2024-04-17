@@ -1,25 +1,33 @@
 package method.qr.kiarelemb.utils.data;
 
-public class QRTextSendData {
-    private final String text;
-    private final long startIndex;
-    private final boolean isEnglish;
+import java.io.Serializable;
 
-    public QRTextSendData(String text, long startIndex, boolean isEnglish) {
-        this.text = text;
-        this.startIndex = startIndex;
-        this.isEnglish = isEnglish;
-    }
+public class QRTextSendData implements Serializable {
+	private final String text;
+	private final long startIndex;
+	private final boolean isEnglish;
+	private final int typeTextByteLen;
 
-    public String text() {
-        return text;
-    }
+	public QRTextSendData(String text, long startIndex, boolean isEnglish, int typeTextByteLen) {
+		this.text = text;
+		this.startIndex = startIndex;
+		this.isEnglish = isEnglish;
+		this.typeTextByteLen = typeTextByteLen;
+	}
 
-    public long startIndex() {
-        return startIndex;
-    }
+	public String text() {
+		return text;
+	}
 
-    public boolean isEnglish() {
-        return isEnglish;
-    }
+	public long startIndex() {
+		return startIndex;
+	}
+
+	public boolean isEnglish() {
+		return isEnglish;
+	}
+
+	public int typeTextByteLen() {
+		return typeTextByteLen;
+	}
 }

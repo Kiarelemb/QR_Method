@@ -1,5 +1,6 @@
 package method.qr.kiarelemb.utils.data;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
@@ -7,7 +8,7 @@ import java.util.Objects;
  * @date 2021/9/5 下午8:25
  * @apiNote 可多字乱序的类
  */
-public class QRStringRandomData implements Comparable<QRStringRandomData> {
+public class QRStringRandomData implements Comparable<QRStringRandomData>, Serializable {
 	private final String text;
 	private final int num;
 
@@ -44,7 +45,7 @@ public class QRStringRandomData implements Comparable<QRStringRandomData> {
 		}
 		QRStringRandomData that = (QRStringRandomData) obj;
 		return Objects.equals(this.text, that.text) &&
-		       this.num == that.num;
+				this.num == that.num;
 	}
 
 	@Override
