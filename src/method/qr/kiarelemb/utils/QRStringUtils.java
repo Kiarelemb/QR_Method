@@ -213,7 +213,7 @@ public class QRStringUtils {
 						sb = new StringBuilder();
 						i++;
 					} else {
-						if (sb.length() > 0) {
+						if (!sb.isEmpty()) {
 							list.add(sb.toString());
 							sb = new StringBuilder();
 						}
@@ -227,7 +227,7 @@ public class QRStringUtils {
 			}
 			sb.append(c);
 		}
-		if (sb.length() > 0) {
+		if (!sb.isEmpty()) {
 			list.add(sb.toString());
 		}
 		return QRArrayUtils.stringListToArr(list);
@@ -252,7 +252,7 @@ public class QRStringUtils {
 						sb = new StringBuilder();
 						i++;
 					} else {
-						if (sb.length() > 0) {
+						if (!sb.isEmpty()) {
 							list.add(sb.toString());
 							sb = new StringBuilder();
 						}
@@ -262,7 +262,7 @@ public class QRStringUtils {
 			}
 			sb.append(c);
 		}
-		if (sb.length() > 0) {
+		if (!sb.isEmpty()) {
 			list.add(sb.toString());
 		}
 		return QRArrayUtils.stringListToArr(list);
@@ -528,7 +528,6 @@ public class QRStringUtils {
 	 */
 	public static boolean isWholeSingleChineseNormal(String s) {
 		char[] c = s.toCharArray();
-		StringBuilder sb = new StringBuilder();
 		for (char value : c) {
 			if (!isChineseNormal(value)) {
 				return false;
@@ -549,7 +548,6 @@ public class QRStringUtils {
 	 */
 	public static boolean isWholeSingleChineseExtra(String s) {
 		char[] c = s.toCharArray();
-		StringBuilder sb = new StringBuilder();
 		for (char value : c) {
 			if (!isChineseExtra(value)) {
 				return false;
@@ -563,7 +561,6 @@ public class QRStringUtils {
 	 */
 	public static boolean containsChineseNormal(String s) {
 		char[] c = s.toCharArray();
-		StringBuilder sb = new StringBuilder();
 		for (char value : c) {
 			if ((value >= CHINESE_NORMAL[0] && value <= CHINESE_NORMAL[3]) && (value <= CHINESE_NORMAL[1] || value >= CHINESE_NORMAL[2])) {
 				return true;
@@ -577,7 +574,6 @@ public class QRStringUtils {
 	 */
 	public static boolean containsChineseExtra(String s) {
 		char[] c = s.toCharArray();
-		StringBuilder sb = new StringBuilder();
 		for (char value : c) {
 			if (value >= CHINESE_NORMAL[0] && value <= CHINESE_NORMAL[1]) {
 				return true;
@@ -591,12 +587,11 @@ public class QRStringUtils {
 	 */
 	public static boolean isWholeSingleChinese(String s) {
 		StringBuilder sb = isCharInRange(s, CHINESE_NORMAL);
-		final String s1 = sb.toString();
-		if (s1.isEmpty()) {
+		if (sb.isEmpty()) {
 			return true;
 		}
 		//再识别拓展字
-		return isWholeSingleChineseExtra(s1);
+		return isWholeSingleChineseExtra(sb.toString());
 	}
 
 	/**
@@ -891,7 +886,7 @@ public class QRStringUtils {
 	}
 
 	public static String getSha1(String str) {
-		if (str == null || str.length() == 0) {
+		if (str == null || str.isEmpty()) {
 			return null;
 		}
 		char[] hexDigits = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
@@ -921,7 +916,7 @@ public class QRStringUtils {
 	 * @return 第几次出现的位置
 	 */
 	public static int getIndexWhenFindTimes(String str, String searchStr, int findTimes) {
-		if (str == null || searchStr == null || findTimes <= 0 || searchStr.length() == 0) {
+		if (str == null || searchStr == null || findTimes <= 0 || searchStr.isEmpty()) {
 			return -1;
 		}
 		int found = 0;
@@ -947,7 +942,7 @@ public class QRStringUtils {
 	 * @return 若未达到预期，则返回 {@code false}
 	 */
 	public static boolean findAtLeast(String str, String searchStr, int findTimes) {
-		if (str == null || searchStr == null || findTimes < 0 || searchStr.length() == 0) {
+		if (str == null || searchStr == null || findTimes < 0 || searchStr.isEmpty()) {
 			return false;
 		}
 		int found = 0;
@@ -972,7 +967,7 @@ public class QRStringUtils {
 	 * @return 若未达到预期，则返回 {@code false}
 	 */
 	public static boolean findAtTimes(String str, String searchStr, int findTimes) {
-		if (str == null || searchStr == null || findTimes < 0 || searchStr.length() == 0) {
+		if (str == null || searchStr == null || findTimes < 0 || searchStr.isEmpty()) {
 			return false;
 		}
 		int found = 0;
@@ -1009,7 +1004,7 @@ public class QRStringUtils {
 	 * @return
 	 */
 	public static int findTimes(String str, String searchStr) {
-		if (str == null || searchStr == null || searchStr.length() == 0) {
+		if (str == null || searchStr == null || searchStr.isEmpty()) {
 			return -1;
 		}
 		if (!str.contains(searchStr)) {
@@ -1035,32 +1030,7 @@ public class QRStringUtils {
 		//对内容加盐
 		String code = getSha1(s + grade);
 		return code.substring(0, 6);
-//        ArrayList<Integer> list = new ArrayList();
-//        while (list.size() < 6) {
-//            int n = getRandomInt(code.length());
-//            if (!list.contains(n)) {
-//                list.add(n);
-//            }
-//        }
-//        Collections.sort(list);
-//        return list.stream().mapToInt(i -> i).mapToObj(i -> String.valueOf(code.charAt(i))).collect(Collectors.joining());
 	}
-
-//    public static boolean sha1ShortCheck(String str) {
-//        try {
-//            String mark = "成绩单:";
-//            int startIndex = str.lastIndexOf(mark);
-//            String substring = str.substring(0, startIndex).trim();
-//            String code = getSha1("Kiarelemb" + substring + "QR");
-//            String shortCode = str.substring(startIndex + mark.length()).trim();
-//            if (shortCode.length() == 6) {
-//                return code.substring(0, 6).equals(shortCode);
-//            }
-//        } catch (Exception e) {
-//            QRTools.doNothing();
-//        }
-//        return false;
-//    }
 
 	/**
 	 * @param grade 成绩单
@@ -1127,7 +1097,7 @@ public class QRStringUtils {
 			return false;
 		}
 		for (String s : num) {
-			if (s == null || s.length() == 0) {
+			if (s == null || s.isEmpty()) {
 				return false;
 			}
 			char[] c = s.toCharArray();
@@ -1382,13 +1352,13 @@ public class QRStringUtils {
 			if (isNumberStrict(String.valueOf(c))) {
 				sb.append(c);
 			} else {
-				if (sb.length() != 0) {
+				if (!sb.isEmpty()) {
 					nums.add(Integer.valueOf(sb.toString()));
 					sb = new StringBuilder();
 				}
 			}
 		}
-		if (sb.length() != 0) {
+		if (!sb.isEmpty()) {
 			nums.add(Integer.valueOf(sb.toString()));
 		}
 		int[] n = new int[nums.size()];
