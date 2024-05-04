@@ -584,7 +584,7 @@ public class QRFileUtils {
 						if (isEnglish) {
 							otw.write(QRTextWash.lightWashForEnglish(text));
 						} else {
-							otw.write(QRStringUtils.convertToSimplifiedChinese(QRTextWash.lightWashForChinese(text)));
+							otw.write(QRTextWash.lightWashForChinese(text));
 						}
 						otw.flush();
 					}

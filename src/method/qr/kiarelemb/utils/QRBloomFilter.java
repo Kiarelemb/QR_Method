@@ -160,7 +160,7 @@ public class QRBloomFilter<E> implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final QRBloomFilter<E> other = (QRBloomFilter<E>) obj;
+        final QRBloomFilter other = (QRBloomFilter) obj;
         if (this.expectedNumberOfFilterElements != other.expectedNumberOfFilterElements) {
             return false;
         }

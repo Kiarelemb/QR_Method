@@ -1,6 +1,5 @@
 package method.qr.kiarelemb.utils;
 
-import com.github.houbb.opencc4j.util.ZhConverterUtil;
 import method.qr.kiarelemb.utils.data.QRStringSearchResult;
 
 import javax.swing.*;
@@ -1320,45 +1319,6 @@ public class QRStringUtils {
 		}
 		return pattern.matcher(path).matches();
 	}
-
-	//region 简繁操作
-
-	/**
-	 * 判断一个字符串是不是中文简体
-	 */
-	public static boolean isSimplifiedChinese(String str) {
-		return ZhConverterUtil.isSimple(str);
-	}
-
-	/**
-	 * 该方法带有是否是简体的判断，如果不是简体，就会转为简体
-	 */
-	public static String convertToSimplifiedChinese(String str) {
-		if (isSimplifiedChinese(str)) {
-			return str;
-		} else {
-			return ZhConverterUtil.toSimple(str);
-		}
-	}
-
-	/**
-	 * 判断一个字符串是不是中文繁体
-	 */
-	public static boolean isTraditionalChinese(String str) {
-		return ZhConverterUtil.isTraditional(str);
-	}
-
-	/**
-	 * 该方法带有是否是繁体的判断，如果不是繁体，就会转为繁体
-	 */
-	public static String convertToTraditionalChinese(String str) {
-		if (isTraditionalChinese(str)) {
-			return str;
-		} else {
-			return ZhConverterUtil.toTraditional(str);
-		}
-	}
-	//endregion
 
 	public static boolean isGrade(String grade) {
 		String[] items = {"速度", "击键", "码长", "正文:", "小启", "成绩单:"};

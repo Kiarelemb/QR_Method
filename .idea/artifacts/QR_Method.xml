@@ -9,7 +9,6 @@
       <element id="extracted-dir" path="$PROJECT_DIR$/../MyTypeTool/lib/cpdetector_1.0.10.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/../MyTypeTool/lib/jna-5.10.0.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/../MyTypeTool/lib/mobi-api4java-qr.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/../MyTypeTool/lib/opencc4j-1.7.1.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/../MyTypeTool/lib/system-hook-3.8.jar" path-in-jar="/" />
       <element id="module-source" name="QR_Method" />
     </root>
