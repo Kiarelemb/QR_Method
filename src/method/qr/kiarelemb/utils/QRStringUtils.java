@@ -540,7 +540,7 @@ public class QRStringUtils {
 	 * 判断中文拓展字
 	 */
 	public static boolean isChineseExtra(char value) {
-		return value >= CHINESE_NORMAL[0] && value <= CHINESE_NORMAL[1];
+		return value >= CHINESE_EXTRA[0] && value <= CHINESE_EXTRA[1];
 	}
 
 	/**
