@@ -1,7 +1,6 @@
 package method.qr.kiarelemb.utils;
 
 import info.monitorenter.cpdetector.io.*;
-import method.qr.kiarelemb.utils.data.QRFileLoadData;
 import method.qr.kiarelemb.utils.data.QRStringRandomData;
 import method.qr.kiarelemb.utils.data.QRTextSendData;
 import method.qr.kiarelemb.utils.inter.QRDirLoopSingleFileAction;
@@ -1764,11 +1763,11 @@ public class QRFileUtils {
         return null;
     }
 
-    public static void fileSelect(Window parent, String fileType, QRFileLoadData fileSelectedAction, String extension) {
+    public static void fileSelect(Window parent, String fileType, QRDirLoopSingleFileAction fileSelectedAction, String extension) {
         fileSelect(parent, fileType, fileSelectedAction, new String[]{extension});
     }
 
-    public static void fileSelect(Window parent, String fileType, QRFileLoadData fileSelectedAction, String... extension) {
+    public static void fileSelect(Window parent, String fileType, QRDirLoopSingleFileAction fileSelectedAction, String... extension) {
         File file = fileSelect(parent, fileType, extension);
         if (file != null) {
             fileSelectedAction.action(file);
