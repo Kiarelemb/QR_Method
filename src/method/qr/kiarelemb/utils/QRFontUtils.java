@@ -35,7 +35,7 @@ public class QRFontUtils {
         try {
             String fileName = QRFileUtils.getFileName(file);
             if (FONT_MAP.containsKey(fileName)) {
-                return FONT_MAP.get(fileName).deriveFont(size);
+                return FONT_MAP.get(fileName).deriveFont((float) size);
             }
             InputStream is = new FileInputStream(file);
             //返回一个指定字体类型和输入数据的font
@@ -72,7 +72,7 @@ public class QRFontUtils {
 
     public static Font getFont(String fontFamily, int size) {
         if (FONT_MAP.containsKey(fontFamily)) {
-            return FONT_MAP.get(fontFamily).deriveFont(size);
+            return FONT_MAP.get(fontFamily).deriveFont((float) size);
         }
         Font font = new Font(fontFamily, Font.PLAIN, size);
         FONT_MAP.put(font.getFontName(), font);
