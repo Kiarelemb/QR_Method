@@ -213,7 +213,7 @@ public class QRStringUtils {
 						sb = new StringBuilder();
 						i++;
 					} else {
-						if (!sb.isEmpty()) {
+						if (sb.length() != 0) {
 							list.add(sb.toString());
 							sb = new StringBuilder();
 						}
@@ -227,7 +227,7 @@ public class QRStringUtils {
 			}
 			sb.append(c);
 		}
-		if (!sb.isEmpty()) {
+		if (sb.length() != 0) {
 			list.add(sb.toString());
 		}
 		return QRArrayUtils.stringListToArr(list);
@@ -252,7 +252,7 @@ public class QRStringUtils {
 						sb = new StringBuilder();
 						i++;
 					} else {
-						if (!sb.isEmpty()) {
+						if (sb.length() != 0) {
 							list.add(sb.toString());
 							sb = new StringBuilder();
 						}
@@ -262,7 +262,7 @@ public class QRStringUtils {
 			}
 			sb.append(c);
 		}
-		if (!sb.isEmpty()) {
+		if (sb.length() != 0) {
 			list.add(sb.toString());
 		}
 		return QRArrayUtils.stringListToArr(list);
@@ -587,7 +587,7 @@ public class QRStringUtils {
 	 */
 	public static boolean isWholeSingleChinese(String s) {
 		StringBuilder sb = isCharInRange(s, CHINESE_NORMAL);
-		if (sb.isEmpty()) {
+		if (sb.length() != 0) {
 			return true;
 		}
 		//再识别拓展字
@@ -1352,13 +1352,13 @@ public class QRStringUtils {
 			if (isNumberStrict(String.valueOf(c))) {
 				sb.append(c);
 			} else {
-				if (!sb.isEmpty()) {
+				if (sb.length() != 0) {
 					nums.add(Integer.valueOf(sb.toString()));
 					sb = new StringBuilder();
 				}
 			}
 		}
-		if (!sb.isEmpty()) {
+		if (sb.length() != 0) {
 			nums.add(Integer.valueOf(sb.toString()));
 		}
 		int[] n = new int[nums.size()];

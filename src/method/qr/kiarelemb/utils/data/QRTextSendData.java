@@ -3,7 +3,6 @@ package method.qr.kiarelemb.utils.data;
 import java.io.Serializable;
 
 public class QRTextSendData implements Serializable {
-	@java.io.Serial
 	private static final long serialVersionUID = 541669446331057502L;
 
 	private final String text;
