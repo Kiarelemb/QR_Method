@@ -55,9 +55,14 @@ public class QRFileUtils {
         FILE_CODES.add("US-ASCII");
     }
 
-    public static void fileReader(String filePath, QRFileReaderLineAction action) {
+
+    public static void fileReaderWithUtf8(String filePath, QRFileReaderLineAction action) {
+        fileReader(filePath, StandardCharsets.UTF_8, action);
+    }
+
+    public static void fileReader(String filePath, Charset charset, QRFileReaderLineAction action) {
         try {
-            final FileReader reader = new FileReader(filePath);
+            final FileReader reader = new FileReader(filePath, charset);
             BufferedReader in = new BufferedReader(reader);
             String lineText;
             while ((lineText = in.readLine()) != null) {
@@ -69,9 +74,13 @@ public class QRFileUtils {
         }
     }
 
-    public static void fileReader(String filePath, String split, QRFileReaderLineSplitAction action) {
+    public static void fileReaderWithUtf8(String filePath, String split, QRFileReaderLineSplitAction action) {
+        fileReader(filePath, StandardCharsets.UTF_8, split, action);
+    }
+
+    public static void fileReader(String filePath, Charset charset, String split, QRFileReaderLineSplitAction action) {
         try {
-            final FileReader reader = new FileReader(filePath);
+            final FileReader reader = new FileReader(filePath, charset);
             BufferedReader in = new BufferedReader(reader);
             String lineText;
             while ((lineText = in.readLine()) != null) {
@@ -83,45 +92,49 @@ public class QRFileUtils {
         }
     }
 
-    public static LinkedList<String> fileReader(File file, Charset charset) {
-        LinkedList<String> arr = new LinkedList<>();
-        try {
-            final FileReader reader = new FileReader(file, charset);
-            BufferedReader in = new BufferedReader(reader);
-            String lineText;
-            while ((lineText = in.readLine()) != null) {
-                arr.add(lineText);
-            }
-            in.close();
-        } catch (Exception e1) {
-            e1.printStackTrace();
-        }
-        return arr;
-    }
-
     public static LinkedList<String> fileReader(String filePath, Charset charset) {
         return fileReader(new File(filePath), charset);
     }
 
-    public static LinkedList<String> fileReaderWithUtf8(File file) {
-        LinkedList<String> arr = new LinkedList<>();
+    public static LinkedList<String> fileReader(File file, Charset charset) {
         try {
             FileInputStream fis = new FileInputStream(file);
-            InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
+            return fileReader(fis, charset);
+        } catch (Exception e1) {
+            e1.printStackTrace();
+        }
+        return new LinkedList<>();
+    }
+
+    public static LinkedList<String> fileReaderWithUtf8(String filePath) {
+        return fileReaderWithUtf8(new File(filePath));
+    }
+
+    public static LinkedList<String> fileReaderWithUtf8(File file) {
+        try {
+            FileInputStream fis = new FileInputStream(file);
+            return fileReader(fis, StandardCharsets.UTF_8);
+        } catch (Exception e1) {
+            e1.printStackTrace();
+        }
+        return new LinkedList<>();
+    }
+
+    public static LinkedList<String> fileReader(InputStream stream, Charset charset) {
+        LinkedList<String> arr = new LinkedList<>();
+        try {
+            InputStreamReader isr = new InputStreamReader(stream, charset);
             BufferedReader in = new BufferedReader(isr);
             String lineText;
             while ((lineText = in.readLine()) != null) {
                 arr.add(lineText);
             }
             in.close();
+            isr.close();
         } catch (Exception e1) {
             e1.printStackTrace();
         }
         return arr;
-    }
-
-    public static LinkedList<String> fileReaderWithUtf8(String filePath) {
-        return fileReaderWithUtf8(new File(filePath));
     }
 
     /**
@@ -142,36 +155,6 @@ public class QRFileUtils {
      */
     public static String fileReaderWithUtf8All(File file) {
         return QRStringUtils.join(fileReaderWithUtf8(file), "\n");
-    }
-
-    public static void fileReaderWithUtf8(String filePath, QRFileReaderLineAction action) {
-        try {
-            FileInputStream fis = new FileInputStream(filePath);
-            InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
-            BufferedReader in = new BufferedReader(isr);
-            String lineText;
-            while ((lineText = in.readLine()) != null) {
-                action.lineText(lineText);
-            }
-            in.close();
-        } catch (Exception e1) {
-            e1.printStackTrace();
-        }
-    }
-
-    public static void fileReaderWithUtf8(String filePath, String split, QRFileReaderLineSplitAction action) {
-        try {
-            FileInputStream fis = new FileInputStream(filePath);
-            InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
-            BufferedReader in = new BufferedReader(isr);
-            String lineText;
-            while ((lineText = in.readLine()) != null) {
-                action.lineText(lineText, lineText.split(split));
-            }
-            in.close();
-        } catch (Exception e1) {
-            e1.printStackTrace();
-        }
     }
 
     public static ArrayList<String> fileReaderFromLine100WithUTF8(String filePath) {
@@ -1326,33 +1309,20 @@ public class QRFileUtils {
     }
 
     public static int getFileLineNumWithUtf8(String filePath) {
-        File f = new File(filePath);
-        if (!f.exists()) {
-            return -1;
-        }
-        try {
-            int i = 0;
-            FileInputStream fis = new FileInputStream(filePath);
-            InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
-            BufferedReader in = new BufferedReader(isr);
-            while (in.readLine() != null) {
-                i++;
-            }
-            in.close();
-            return i;
-        } catch (Exception e1) {
-            return -1;
-        }
+        return getFileLineNum(filePath, StandardCharsets.UTF_8);
     }
 
     public static int getFileLineNum(String filePath) {
-        File f = new File(filePath);
-        if (!f.exists()) {
-            return -1;
-        }
         final Charset fileCode = getFileCode(filePath);
         if (fileCode == null) {
-//            System.out.println("文件编码识别失败！");
+            return -1;
+        }
+        return getFileLineNum(filePath, fileCode);
+    }
+
+    public static int getFileLineNum(String filePath, Charset fileCode) {
+        File f = new File(filePath);
+        if (!f.exists()) {
             return -1;
         }
         try {
@@ -1410,7 +1380,15 @@ public class QRFileUtils {
         }
         try {
             FileInputStream fis = new FileInputStream(file);
-            InputStreamReader isr = new InputStreamReader(fis, charset);
+            return getFileLineText(fis, line, charset);
+        } catch (Exception ignore) {
+        }
+        return "";
+    }
+
+    public static String getFileLineText(InputStream stream, int line, Charset charset) {
+        try {
+            InputStreamReader isr = new InputStreamReader(stream, charset);
             BufferedReader in = new BufferedReader(isr);
             int i = 1;
             String lineText;
@@ -1420,6 +1398,7 @@ public class QRFileUtils {
                 }
             }
             in.close();
+            isr.close();
         } catch (Exception ignore) {
         }
         return "";
