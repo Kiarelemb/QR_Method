@@ -1787,20 +1787,25 @@ public class QRStringUtils {
         if (str == null) {
             return "";
         }
+        List<String> list = new ArrayList<>();
         Set<String> set = new HashSet<>();
         for (String s : str) {
             if (s == null) {
                 continue;
             }
             String[] parts = QRStringUtils.getChineseExtraPhrase(s);
-            set.addAll(Arrays.asList(parts));
+            for (String part : parts) {
+                if (set.add(part)) {
+                    list.add(part);
+                }
+            }
         }
-        if (set.size() == 0) {
+        if (list.isEmpty()) {
             return "";
         }
-        if (set.size() == 1)
-            return set.iterator().next();
-        return QRStringUtils.join(set, "");
+        if (list.size() == 1)
+            return list.get(0);
+        return QRStringUtils.join(list, "");
     }
     //endregion repeat
 
