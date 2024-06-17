@@ -23,6 +23,7 @@ public class QRTimeUtils {
 	private static final String WWW_NTSC_AC_CN = "http://www.ntsc.ac.cn";
 	static SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
 	static SimpleDateFormat dateAndTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	static SimpleDateFormat dateAndTimeMMFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 	private static String onlineDate = null;
 
 	/**
