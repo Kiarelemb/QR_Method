@@ -1,5 +1,7 @@
 package method.qr.kiarelemb.utils;
 
+import javax.swing.*;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -7,13 +9,14 @@ import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 import java.util.logging.*;
 
 /**
  * @author Kiarelemb
  * @projectName QR_Method
  * @className QRLoggerUtils
- * @description TODO
+ * @description 当前 log 方法还存在诸多问题，有待完善
  * @create 2024/6/17 下午8:03
  */
 public class QRLoggerUtils {
@@ -22,6 +25,8 @@ public class QRLoggerUtils {
     public static Level writeLevel;
     public static ConsoleHandler consoleHandler;
     public static FileHandler fileHandler;
+    public static int classMsgMaxLength = 152;
+    public static String prefix = "method";
 
     /**
      * 使用默认的功能初始化 logger 配置
@@ -38,15 +43,29 @@ public class QRLoggerUtils {
         logFilePath = dir + now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + ".log";
         QRFileUtils.fileCreate(logFilePath);
         Formatter formatter = new Formatter() {
+
+
             @Override
             public String format(LogRecord record) {
                 String dataFormat = QRTimeUtils.dateAndTimeMMFormat.format(Long.valueOf(record.getMillis()));
 
-                Thread currentThread = Thread.currentThread();
-                StackTraceElement stackTrace = currentThread.getStackTrace()[8];
-                String msg = String.format("%s\tlevel:%s\t[%s:%s] %s:%d\t%s\n", dataFormat, record.getLevel(),
-                        stackTrace.getClassName(), stackTrace.getMethodName(), stackTrace.getFileName(),
-                        stackTrace.getLineNumber(), record.getMessage());
+                StackTraceElement[] trace = Thread.currentThread().getStackTrace();
+                StackTraceElement stackTrace = trace[0];
+                for (StackTraceElement element : trace) {
+                    if (element.getClassName().startsWith(prefix)) {
+                        stackTrace = element;
+                        break;
+                    }
+                }
+                String levelTmp = record.getLevel().toString();
+                String level = levelTmp + "\t".repeat((8 - levelTmp.length()) / 4 + (levelTmp.length() % 4 == 0 ? 0 : 1));
+
+                String classTmp = String.format("[%s:%s] %s:%d", stackTrace.getClassName(), stackTrace.getMethodName(),
+                        stackTrace.getFileName(), stackTrace.getLineNumber());
+                int restLen = classMsgMaxLength - classTmp.length();
+                int times = restLen / 4 + (classTmp.length() % 4 == 0 ? 0 : 1);
+                String classMsg = classTmp + "\t".repeat(Math.max(times, 0));
+                String msg = String.format("%s\t%s\t%s\t%s\n", dataFormat, level, classMsg, record.getMessage());
                 String throwable = "";
                 if (record.getThrown() != null) {
                     StringWriter sw = new StringWriter();
@@ -61,11 +80,37 @@ public class QRLoggerUtils {
         };
 
         QRLoggerUtils.outputLevel = outputLevel;
-        consoleHandler = new ConsoleHandler();
+        consoleHandler = new ConsoleHandler() {
+
+            private String preRecord = "";
+
+            @Override
+            public synchronized void publish(LogRecord record) {
+                String format = getFormatter().format(record);
+                if (format.equals(preRecord)) {
+                    return;
+                }
+                preRecord = format;
+                super.publish(record);
+            }
+        };
         consoleHandler.setLevel(outputLevel);
         consoleHandler.setFormatter(formatter);
         try {
-            fileHandler = new FileHandler(logFilePath, true);
+            fileHandler = new FileHandler(logFilePath, true) {
+
+                private String preRecord = "";
+
+                @Override
+                public synchronized void publish(LogRecord record) {
+                    String format = getFormatter().format(record);
+                    if (format.equals(preRecord)) {
+                        return;
+                    }
+                    preRecord = format;
+                    super.publish(record);
+                }
+            };
             QRLoggerUtils.writeLevel = writeLevel;
             fileHandler.setLevel(writeLevel);
             fileHandler.setEncoding("UTF-8");
@@ -102,7 +147,11 @@ public class QRLoggerUtils {
             consoleHandler.setLevel(outputLevel);
             logger.addHandler(consoleHandler);
         }
-
+        logger.setLevel(writeLevel);
         return logger;
+    }
+
+    public static void log(Logger logger, Level level, String format, Object... args) {
+        logger.log(level, String.format(format, args));
     }
 }
