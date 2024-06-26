@@ -9,10 +9,10 @@ import java.util.Objects;
  * @apiNote 可多字乱序的类
  */
 public class QRStringRandomData implements Comparable<QRStringRandomData>, Serializable {
-	private final String text;
+	private final Object text;
 	private final int num;
 
-	public QRStringRandomData(String text, int num) {
+	public QRStringRandomData(Object text, int num) {
 		this.text = text;
 		this.num = num;
 	}
@@ -27,7 +27,7 @@ public class QRStringRandomData implements Comparable<QRStringRandomData>, Seria
 		return this.num > o.num ? 1 : -1;
 	}
 
-	public String text() {
+	public Object text() {
 		return text;
 	}
 

@@ -65,26 +65,27 @@ public class QRArrayUtils {
                 .toArray(QRStringUtils.ARR_EMPTY);
     }
 
-    public static String[] getRandomPhrase(List<String> list) {
+
+    public static Object[] getRandomObject(List<?> list) {
+        Object[] objects = list.toArray(new Object[0]);
         if (list.size() == 1) {
-            return QRArrayUtils.stringListToArr(list);
+            return objects;
         }
-        ArrayList<QRStringRandomData> asr = stringRandomDataRandom(QRArrayUtils.stringListToArr(list));
+        ArrayList<QRStringRandomData> asr = stringRandomDataRandom(objects);
         return asr.stream()
                 .map(QRStringRandomData::text)
-                .collect(Collectors.toCollection(ArrayList::new))
-                .toArray(QRStringUtils.ARR_EMPTY);
+                .toArray(Object[]::new);
     }
 
     /**
      * stringRandomData的乱序算法
      */
-    private static ArrayList<QRStringRandomData> stringRandomDataRandom(String[] str) {
+    private static ArrayList<QRStringRandomData> stringRandomDataRandom(Object[] str) {
         int length = str.length;
         LinkedList<Integer> li = getOrderedIntegers(length);
         ArrayList<QRStringRandomData> asr = new ArrayList<>();
         int i = 0;
-        while (li.size() != 0) {
+        while (!li.isEmpty()) {
             int num = li.get(QRRandomUtils.getRandomInt(li.size()));
             if (i != num) {
                 asr.add(new QRStringRandomData(str[i], num));

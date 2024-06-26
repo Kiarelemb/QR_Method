@@ -47,7 +47,7 @@ public class QRLoggerUtils {
 
             @Override
             public String format(LogRecord record) {
-                String dataFormat = QRTimeUtils.dateAndTimeMMFormat.format(Long.valueOf(record.getMillis()));
+                String dataFormat = QRTimeUtils.dateAndTimeMMFormat.format(record.getMillis());
 
                 StackTraceElement[] trace = Thread.currentThread().getStackTrace();
                 StackTraceElement stackTrace = trace[0];

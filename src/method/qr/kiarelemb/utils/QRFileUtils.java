@@ -914,7 +914,7 @@ public class QRFileUtils {
                         char c = QRStringUtils.A_WHITE_SPACE_CHAR;
                         final QRStringRandomData data = QRTimeUtils.cutAtTimes(text, c, len);
                         finalStartIndex = data.num();
-                        text = data.text();
+                        text = data.text().toString();
                         break;
                     }
                 }
@@ -1012,7 +1012,7 @@ public class QRFileUtils {
                         char c = QRStringUtils.A_WHITE_SPACE_CHAR;
                         final QRStringRandomData data = QRTimeUtils.cutAtTimes(text, c, len);
                         finalLen = data.num();
-                        text = data.text();
+                        text = data.text().toString();
                         break;
                     }
                 }
@@ -1788,8 +1788,12 @@ public class QRFileUtils {
      * @param charset 编码
      */
     public static void fileLineRandom(File file, Charset charset) {
-        LinkedList<String> list = fileReader(file, charset);
-        String[] phrase = QRArrayUtils.getRandomPhrase(list);
-        fileWriter(file, phrase, charset);
+        List<String> list = fileReader(file, charset);
+        String[] arr = new String[list.size()];
+        Object[] randomPhrase = QRArrayUtils.getRandomObject(list);
+        for (int i = 0, randomPhraseLength = randomPhrase.length; i < randomPhraseLength; i++) {
+            arr[i] = randomPhrase[i].toString();
+        }
+        fileWriter(file, arr, charset);
     }
 }
