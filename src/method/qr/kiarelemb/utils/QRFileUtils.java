@@ -60,10 +60,23 @@ public class QRFileUtils {
         fileReader(filePath, StandardCharsets.UTF_8, action);
     }
 
+    public static void fileReaderWithUtf8(InputStream stream, QRFileReaderLineAction action) {
+        fileReader(stream, StandardCharsets.UTF_8, action);
+    }
+
     public static void fileReader(String filePath, Charset charset, QRFileReaderLineAction action) {
         try {
-            final FileReader reader = new FileReader(filePath, charset);
-            BufferedReader in = new BufferedReader(reader);
+            final FileInputStream stream = new FileInputStream(filePath);
+            fileReader(stream, charset, action);
+        } catch (Exception e1) {
+            e1.printStackTrace();
+        }
+    }
+
+    public static void fileReader(InputStream stream, Charset charset, QRFileReaderLineAction action) {
+        try {
+            InputStreamReader isr = new InputStreamReader(stream, charset);
+            BufferedReader in = new BufferedReader(isr);
             String lineText;
             while ((lineText = in.readLine()) != null) {
                 action.lineText(lineText);
@@ -78,10 +91,23 @@ public class QRFileUtils {
         fileReader(filePath, StandardCharsets.UTF_8, split, action);
     }
 
+    public static void fileReaderWithUtf8(InputStream stream, String split, QRFileReaderLineSplitAction action) {
+        fileReader(stream, StandardCharsets.UTF_8, split, action);
+    }
+
     public static void fileReader(String filePath, Charset charset, String split, QRFileReaderLineSplitAction action) {
         try {
-            final FileReader reader = new FileReader(filePath, charset);
-            BufferedReader in = new BufferedReader(reader);
+            final FileInputStream stream = new FileInputStream(filePath);
+            fileReader(stream, charset, split, action);
+        } catch (Exception e1) {
+            e1.printStackTrace();
+        }
+    }
+
+    public static void fileReader(InputStream stream, Charset charset, String split, QRFileReaderLineSplitAction action) {
+        try {
+            InputStreamReader isr = new InputStreamReader(stream, charset);
+            BufferedReader in = new BufferedReader(isr);
             String lineText;
             while ((lineText = in.readLine()) != null) {
                 action.lineText(lineText, lineText.split(split));
