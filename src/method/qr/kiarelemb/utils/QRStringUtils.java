@@ -1898,7 +1898,7 @@ public class QRStringUtils {
      */
     public static KeyStroke getKeyStroke(String str) {
         if (str != null) {
-            KeyStroke keyStroke = KeyStroke.getKeyStroke(str);
+            KeyStroke keyStroke = KeyStroke.getKeyStroke(str.replace("\t", "TAB"));
             if (keyStroke != null) {
                 return keyStroke;
             }
