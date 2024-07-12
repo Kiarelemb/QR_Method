@@ -1,15 +1,13 @@
 package method.qr.kiarelemb.utils;
 
-import javax.swing.*;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Objects;
+import java.util.LinkedList;
+import java.util.function.Consumer;
 import java.util.logging.*;
 
 /**
@@ -75,7 +73,9 @@ public class QRLoggerUtils {
                     pw.close();
                     throwable = sw.toString();
                 }
-                return msg + throwable;
+                String total = msg + throwable;
+                if (!CONSUMER_LINKED_LIST.isEmpty()) CONSUMER_LINKED_LIST.forEach(c -> c.accept(total));
+                return total;
             }
         };
 
@@ -149,6 +149,13 @@ public class QRLoggerUtils {
         }
         logger.setLevel(writeLevel);
         return logger;
+    }
+
+
+    private static final LinkedList<Consumer<String>> CONSUMER_LINKED_LIST = new LinkedList<>();
+
+    public static void addMessageOutputAction(Consumer<String> c) {
+        CONSUMER_LINKED_LIST.add(c);
     }
 
     public static void log(Logger logger, Level level, String format, Object... args) {
