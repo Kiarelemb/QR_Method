@@ -159,7 +159,7 @@ public class QRTimeUtils {
 		if (totalTimeInMin <= 1.0) {
 			final String format = String.format("%.3f", totalTimeInSec);
 			final String[] split = format.split("\\.");
-			timeCost = split[0] + "秒" + split[1];
+			timeCost = split[0] + "." + split[1];
 		} else {
 			String fore = "";
 			double rest = totalTimeInSec;
@@ -167,7 +167,7 @@ public class QRTimeUtils {
 			if (totalTimeInMin > 60) {
 				hour = (int) (totalTimeInMin / 60);
 				rest -= hour * 60 * 60;
-				fore = hour + "时";
+				fore = hour + ":";
 			}
 			int min = (int) (rest / 60);
 			rest -= min * 60;
@@ -176,7 +176,7 @@ public class QRTimeUtils {
 			if (split[0].length() == 1) {
 				split[0] = "0" + split[0];
 			}
-			timeCost = fore + min + "分" + split[0] + "秒" + split[1];
+			timeCost = fore + min + ":" + split[0] + "." + split[1];
 		}
 		return timeCost;
 	}
