@@ -480,7 +480,15 @@ public class QRFileUtils {
         if (file.exists()) {
             return true;
         }
-        File parent = file.getParentFile().getAbsoluteFile();
+        File parentFile = file.getParentFile();
+        if (parentFile == null) {
+            try {
+                return file.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        File parent = parentFile.getAbsoluteFile();
         try {
             if (!parent.exists()) {
                 if (!dirCreate(parent)) {
