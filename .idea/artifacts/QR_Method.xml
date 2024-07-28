@@ -6,11 +6,12 @@
       <element id="extracted-dir" path="$PROJECT_DIR$/../MyTypeTool/lib/antlr-2.7.4.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/../MyTypeTool/lib/apache-ant-zip.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/../MyTypeTool/lib/chardet-1.0.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/../MyTypeTool/lib/cpdetector_1.0.10.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/../MyTypeTool/lib/jna-5.10.0.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/../MyTypeTool/lib/mobi-api4java-qr.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/../MyTypeTool/lib/system-hook-3.8.jar" path-in-jar="/" />
       <element id="module-source" name="QR_Method" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jProcesses.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../MyTypeTool/lib/cpdetector-1.0.10.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../MyTypeTool/lib/jna-5.14.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../MyTypeTool/lib/jna-platform-5.14.0.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

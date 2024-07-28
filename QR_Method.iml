@@ -28,39 +28,10 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../MyTypeTool/lib/jna-5.10.0.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../MyTypeTool/lib/cpdetector_1.0.10.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
           <root url="jar://$MODULE_DIR$/../MyTypeTool/lib/chardet-1.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../MyTypeTool/lib/system-hook-3.8.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$USER_HOME$/.ideaLibSources/system-hook-3.8-sources.jar!/" />
-        </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
@@ -72,5 +43,8 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="jProcesses" level="project" />
+    <orderEntry type="library" name="cpdetector-1.0.10" level="project" />
+    <orderEntry type="library" name="jna-5.14.0" level="project" />
   </component>
 </module>

@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="jProcesses">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/jProcesses.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

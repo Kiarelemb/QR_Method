@@ -67,7 +67,7 @@ public class QRSystemUtils {
                             items = items.substring(0, items.indexOf("("));
                         }
                         osVersion = items.split("=")[1].replaceAll("\"", "").trim();
-                    } else {
+                    } else if(!osName.contains(osVersion)){
                         name = osName + QRStringUtils.A_WHITE_SPACE + osVersion;
                         break;
                     }

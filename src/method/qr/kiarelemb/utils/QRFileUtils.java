@@ -1159,7 +1159,6 @@ public class QRFileUtils {
             charset = detector.detectCodepage(file.toURI().toURL());
             final String name = charset.name();
             if (!FILE_CODES.contains(name)) {
-//				System.out.println("filePath = " + filePath);
                 return null;
             }
         } catch (Exception ex) {
