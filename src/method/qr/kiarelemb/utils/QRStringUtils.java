@@ -1082,6 +1082,20 @@ public class QRStringUtils {
         return Pattern.compile(regex).matcher(str).matches();
     }
 
+    public static int pickNumber(String str){
+        if (str == null || str.isBlank()) {
+            throw new NumberFormatException(str);
+        }
+        var chars = str.toCharArray();
+        StringBuilder sb = new StringBuilder(str.length());
+        for (char c : chars) {
+            if (isNumber(c)) {
+                sb.append(c);
+            }
+        }
+        return Integer.parseInt(sb.toString());
+    }
+
     /**
      * 最多只能有一个小数点
      *

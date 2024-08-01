@@ -67,8 +67,8 @@ public class QRSystemUtils {
                             items = items.substring(0, items.indexOf("("));
                         }
                         osVersion = items.split("=")[1].replaceAll("\"", "").trim();
-                    } else if(!osName.contains(osVersion)){
-                        name = osName + QRStringUtils.A_WHITE_SPACE + osVersion;
+                    } else {
+                        name = osName.contains(osVersion) ? osName : osName + QRStringUtils.A_WHITE_SPACE + osVersion;
                         break;
                     }
                 } else if (!osName.isEmpty() && !osVersion.isEmpty()) {
@@ -352,32 +352,19 @@ public class QRSystemUtils {
     }
 
     public static void setWindowRound(Window w, float f) {
-        if (IS_WINDOWS) {
-            if (f < 0.99) {
-                WindowUtils.setWindowAlpha(w, f);
-            } else {
-                WindowUtils.setWindowAlpha(w, 0.9999f);
-            }
-            final RoundRectangle2D.Double mask;
-            double SCALE = (double) Toolkit.getDefaultToolkit().getScreenResolution() / 96;
-            mask = new RoundRectangle2D.Double(0.0D, 0.0D, w.getWidth() * SCALE, w.getHeight() * SCALE, 10.0D, 10.0D);
-            WindowUtils.setWindowMask(w, mask);
-        }
+        setWindowTrans(w, f);
+        setWindowRound(w);
     }
 
     public static void setWindowTrans(Window w, float alphaFloat) {
-        if (IS_WINDOWS) {
-            if (alphaFloat < 0.99) {
-                WindowUtils.setWindowAlpha(w, alphaFloat);
-            } else {
-                WindowUtils.setWindowAlpha(w, 0.999f);
-            }
+        if (alphaFloat < 0.99) {
+            w.setOpacity(alphaFloat);
+        } else {
+            w.setOpacity(1f);
         }
     }
 
     public static void setWindowNotTrans(Window w) {
-        if (IS_WINDOWS) {
-            WindowUtils.setWindowAlpha(w, 0.999f);
-        }
+        w.setOpacity(1f);
     }
 }
