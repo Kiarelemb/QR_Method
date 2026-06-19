@@ -276,9 +276,9 @@ public class QRRandomUtils {
 			return str;
 		}
 		char[] c = str.toCharArray();
-		LinkedList<Integer> li = QRArrayUtils.getOrderedIntegers(c.length);
+		ArrayList<Integer> li = QRArrayUtils.getOrderedIntegers(c.length);
 		ArrayList<QRCharRandomData> asr = new ArrayList<>();
-		for (int i = 0; li.size() != 0; ) {
+		for (int i = 0; !li.isEmpty(); ) {
 			int num = li.get(getRandomInt(li.size()));
 			if (i != num) {
 				asr.add(new QRCharRandomData(c[i++], num));

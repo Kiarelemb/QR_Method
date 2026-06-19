@@ -3,6 +3,7 @@ package method.qr.kiarelemb.utils;
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.LinkedList;
 import java.util.Properties;
 
 /**
@@ -11,8 +12,49 @@ import java.util.Properties;
  * @apiNote 资源文件的读取工具类
  */
 public class QRPropertiesUtils {
+
+
 	/**
-	 * 加载资源文件
+	 * 加载资源文件。
+	 * 注意，该方法非原生读取方法，而是自定义的读取方法
+	 *
+	 * @param prop 已实例化的资源文件变量
+	 * @param path 该资源文件的保存路径
+	 */
+	public static void loadProp0(Properties prop, String path) {
+		loadProp(prop, path);
+	}
+
+	/**
+	 * 加载资源文件。
+	 * 注意，该方法非原生读取方法，而是自定义的读取方法
+	 *
+	 * @param prop 已实例化的资源文件变量
+	 * @param stream 该资源文件的读取流
+	 */
+	public static void loadProp0(Properties prop, InputStream stream) {
+		loadProp(prop, stream);
+	}
+
+
+	/**
+	 * 保存资源文件。
+	 * 注意，该方法非原生保存方法，而是自定义的保存方法
+	 *
+	 * @param prop 已实例化的资源文件变量
+	 * @param path 该资源文件的保存路径
+	 */
+	public static void storeProp0(Properties prop, String path) {
+		LinkedList<String> lines = new LinkedList<>();
+		for (Object object : prop.keySet()) {
+			lines.add(object.toString() + "=" + prop.getProperty(object.toString()));
+		}
+		QRFileUtils.fileWriterWithUTF8(path, lines);
+	}
+
+	/**
+	 * 加载资源文件。
+	 * 注意，该方法非原生读取方法，而是自定义的读取方法
 	 *
 	 * @param prop 已实例化的资源文件变量
 	 * @param path 该资源文件的保存路径
@@ -21,10 +63,8 @@ public class QRPropertiesUtils {
 		if (prop != null) {
 			try {
 				FileInputStream fis = new FileInputStream(path);
-				InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
-				BufferedReader in = new BufferedReader(isr);
-				prop.load(in);
-				in.close();
+				loadProp(prop, fis);
+				fis.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -32,10 +72,34 @@ public class QRPropertiesUtils {
 	}
 
 	/**
+	 * 加载资源文件。
+	 * 注意，该方法非原生读取方法，而是自定义的读取方法
+	 *
+	 * @param prop 已实例化的资源文件变量
+	 * @param path 该资源文件的保存路径
+	 */
+	public static void loadProp(Properties prop, InputStream stream) {
+		if (prop != null) {
+			QRFileUtils.fileReader(stream, StandardCharsets.UTF_8, lineText -> {
+				lineText = lineText.trim();
+				if (lineText.startsWith("!")) return;
+				int index = lineText.indexOf('#');
+				if (index != -1) {
+					lineText = lineText.substring(0, index).trim();
+				}
+				String[] split = lineText.split("=");
+				if (split.length == 2) {
+					prop.setProperty(split[0].trim(), split[1].trim());
+				}
+			});
+		}
+	}
+
+	/**
 	 * 加载资源文件
 	 *
 	 * @param prop 已实例化的资源文件变量
-	 * @param url 该资源文件的保存路径
+	 * @param url  该资源文件的保存路径
 	 */
 	public static void loadProp(Properties prop, URL url) {
 		if (prop != null) {
@@ -65,7 +129,7 @@ public class QRPropertiesUtils {
 	 * @param prop 已实例化的资源文件变量
 	 */
 	public static void storeProp(Properties prop, String path) {
-		if (prop != null && prop.size() != 0) {
+		if (prop != null && !prop.isEmpty()) {
 			try {
 				FileWriter fileWriter = new FileWriter(path, StandardCharsets.UTF_8);
 				BufferedWriter bw = new BufferedWriter(fileWriter);

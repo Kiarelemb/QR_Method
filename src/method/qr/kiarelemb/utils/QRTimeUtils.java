@@ -229,7 +229,7 @@ public class QRTimeUtils {
 			}
 			if (day > 30) {
 				month = day / 30;
-				day -= month * 30L;
+				day -= month * 30;
 			}
 			int hour = (int) (l / (double60 * 1000) - d * 24);
 			int min = (int) ((l / (60 * 1000)) - d * 24 * 60 - hour * 60);

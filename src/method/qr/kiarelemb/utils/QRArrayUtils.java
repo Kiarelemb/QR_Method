@@ -45,10 +45,10 @@ public class QRArrayUtils {
      *
      * @param max 最后的值为max - 1
      */
-    public static LinkedList<Integer> getOrderedIntegers(int max) {
+    public static ArrayList<Integer> getOrderedIntegers(int max) {
         return IntStream.range(0, max)
                 .boxed()
-                .collect(Collectors.toCollection(LinkedList::new));
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     /**
@@ -82,7 +82,7 @@ public class QRArrayUtils {
      */
     private static ArrayList<QRStringRandomData> stringRandomDataRandom(Object[] str) {
         int length = str.length;
-        LinkedList<Integer> li = getOrderedIntegers(length);
+        ArrayList<Integer> li = getOrderedIntegers(length);
         ArrayList<QRStringRandomData> asr = new ArrayList<>();
         int i = 0;
         while (!li.isEmpty()) {

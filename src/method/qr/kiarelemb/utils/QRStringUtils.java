@@ -29,7 +29,7 @@ public class QRStringUtils {
     public static final char A_WHITE_SPACE_CHAR = ' ';
     public static final char A_TAB_CHAR = '\t';
     public static final String SUPPORTED_CHINESE_MARK = "、，。：！？“”；%《～》…〖〗（）「」〈〉·‘’—";
-    public static final String SUPPORTED_ENGLISH_MARK = " ,.\"'-;!:?&^%#@*()[]{}/1234567890";
+    public static final String SUPPORTED_ENGLISH_MARK = " ,.\"'-;!:?&^%#@*()[]{}\\/1234567890";
     public static final Set<Character> ENGLISH_DIVIDE_MARK = new HashSet<>() {{
         char[] chars = " ,.\"';!:?&^%#@\r\n*‘“([{/%".toCharArray();
         for (char c : chars) {
@@ -283,6 +283,9 @@ public class QRStringUtils {
      * 这个算法来自StringUtils，略改，非个人编写
      */
     public static String join(final String[] array, String separator) {
+        if (array == null || array.length == 0) {
+            return "";
+        }
         final int startIndex = 0;
         final int endIndex = array.length;
         final StringBuilder buf = new StringBuilder(getStringArrLen(array));
@@ -553,6 +556,13 @@ public class QRStringUtils {
     }
 
     /**
+     * 是否含有非英文字符，可用于判断文件路径是否全英文
+     */
+    public static boolean containsNonEnglishChar(String str){
+        return !Objects.equals(QRStringUtils.notEnglishCharClear(str), str);
+    }
+
+    /**
      * 判断是否包含中文
      */
     public static boolean containsChineseNormal(String s) {
@@ -571,7 +581,7 @@ public class QRStringUtils {
     public static boolean containsChineseExtra(String s) {
         char[] c = s.toCharArray();
         for (char value : c) {
-            if (value >= CHINESE_NORMAL[0] && value <= CHINESE_NORMAL[1]) {
+            if (value >= CHINESE_EXTRA[0] && value <= CHINESE_EXTRA[1]) {
                 return true;
             }
         }
@@ -583,7 +593,7 @@ public class QRStringUtils {
      */
     public static boolean isWholeSingleChinese(String s) {
         StringBuilder sb = isCharInRange(s, CHINESE_NORMAL);
-        if (sb.length() != 0) {
+        if (sb.length() == 0) {
             return true;
         }
         //再识别拓展字
@@ -686,12 +696,8 @@ public class QRStringUtils {
      */
     public static boolean isEnglishPhrase(String s) {
         char[] c = s.toCharArray();
-        ArrayList<Character> ach = new ArrayList<>();
-        ach.add('\'');
-        ach.add('-');
-        ach.add('/');
         for (char value : c) {
-            if (value < ENGLISH_RANGE[0] || value > ENGLISH_RANGE[1] || !ach.contains(value)) {
+            if (value < ENGLISH_RANGE[0] || value > ENGLISH_RANGE[1]) {
                 return false;
             }
         }
@@ -789,9 +795,6 @@ public class QRStringUtils {
      */
     public static ArrayList<Integer> appearIndexes(String str, char ch) {
         ArrayList<Integer> ali = new ArrayList<>();
-        if (!str.contains(QRStringUtils.A_WHITE_SPACE)) {
-            return ali;
-        }
         char[] c = str.toCharArray();
         for (int i = 0, cLength = c.length; i < cLength; i++) {
             if (c[i] == ch) {
@@ -1156,6 +1159,9 @@ public class QRStringUtils {
             char[] c = s.toCharArray();
             int i = 0;
             if (c[0] == '-' || c[0] == '+') {
+                if (c.length == 1) {
+                    return false;
+                }
                 i = 1;
             }
             for (int len = c.length; i < len; i++) {
@@ -1174,6 +1180,7 @@ public class QRStringUtils {
      * @param c 字符
      */
     public static boolean isNumber(char c) {
+        if(c == '.') return false;
         return isCharInRange(c, NUMBER_RANGE);
     }
 

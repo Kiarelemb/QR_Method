@@ -280,6 +280,7 @@ public class QRFileUtils {
     public static void fileWriter(File file, String text, Charset charset) {
         try {
             fileDelete(file);
+            fileCreate(file);
             FileWriter fileWriter = new FileWriter(file, charset);
             BufferedWriter bw = new BufferedWriter(fileWriter);
             bw.write(text);
@@ -699,12 +700,7 @@ public class QRFileUtils {
     }
 
     public static String getDirName(File file) {
-        String name = QRFileUtils.getFileName(file);
-        String absolutePath = file.getAbsolutePath();
-        int index = absolutePath.lastIndexOf(name);
-        int last = index - 1;
-        int start = absolutePath.substring(0, last).lastIndexOf("\\") + 1;
-        return absolutePath.substring(start, last);
+        return file.getParentFile().getName();
     }
 
     public static boolean dirDelete(String path, boolean selfDelete) {
@@ -765,17 +761,10 @@ public class QRFileUtils {
             ra.seek(startIndex);
             byte[] b = new byte[length * power];
             int read = ra.read(b);
-            int endIndex = 0;
-            if (read == -1) {
-                for (int i = b.length - 1; i >= 0; i--) {
-                    if (b[i] == 0) {
-                        endIndex = i;
-                    } else {
-                        break;
-                    }
-                }
-                b = Arrays.copyOfRange(b, 0, endIndex);
+            if (read <= 0) {
+                return "";
             }
+            b = Arrays.copyOf(b, read);
             return new String(b, StandardCharsets.UTF_8);
         } catch (Exception e) {
             e.printStackTrace();
@@ -1674,13 +1663,14 @@ public class QRFileUtils {
     public static boolean renameFile(String oldFilePath, String newFilePath, boolean oldFileDelete) {
         File des = new File(newFilePath);
         boolean success = false;
-        if (des.getParentFile().mkdirs()) {
-            success = new File(oldFilePath).renameTo(des);
-            if (success && oldFileDelete) {
-                QRFileUtils.fileDelete(oldFilePath);
-            }
-        }
-        return success;
+		if (!des.getParentFile().mkdirs()) {
+			return success;
+		}
+		success = new File(oldFilePath).renameTo(des);
+		if (success && oldFileDelete) {
+			QRFileUtils.fileDelete(oldFilePath);
+		}
+		return success;
     }
 
     public static void fileDownload(String url, String saveDir, String fileName) throws IOException {
