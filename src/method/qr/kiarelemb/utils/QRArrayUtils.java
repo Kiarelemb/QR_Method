@@ -14,7 +14,10 @@ import java.util.stream.IntStream;
  */
 public class QRArrayUtils {
     /**
-     * 在一组char字符数组中，判断是否有重复元素
+     * 判断字符数组中是否存在重复字符。
+     *
+     * @param group 待检查字符数组
+     * @return 存在重复元素时返回 {@code true}
      */
     public static boolean checkRepeatEle(char[] group) {
         Character[] c = IntStream
@@ -24,6 +27,15 @@ public class QRArrayUtils {
         return checkRepeatEle(c);
     }
 
+    /**
+     * 判断对象数组中是否存在重复元素。
+     * <p>
+     * 通过 {@link HashSet} 去重后比较长度，因此元素是否重复取决于对象的
+     * {@link Object#equals(Object)} 和 {@link Object#hashCode()} 实现。
+     *
+     * @param group 待检查对象数组
+     * @return 存在重复元素时返回 {@code true}
+     */
     public static boolean checkRepeatEle(Object[] group) {
         Set<Object> s = new HashSet<>();
         Collections.addAll(s, group);
@@ -31,7 +43,13 @@ public class QRArrayUtils {
     }
 
     /**
-     * 将多个空格转为一个空格
+     * 规范化文本中的连续空白。
+     * <p>
+     * 连续回车或连续换行会先压缩为一个 {@code \n}，连续普通空格会压缩为一个空格，
+     * 最后会去除首尾空白。不会处理制表符或全角空格。
+     *
+     * @param text 待处理文本
+     * @return 规范化后的文本
      */
     public static String spaceFormat(String text) {
         for (String s : Arrays.asList("\r+", "\n{2,}")) {
@@ -41,9 +59,12 @@ public class QRArrayUtils {
     }
 
     /**
-     * 从零开始，向 LinkedList 中添加 max 个数
+     * 生成从 {@code 0} 到 {@code max - 1} 的整数列表。
+     * <p>
+     * 常用于需要一组下标再随机抽取、排序或映射的场景。
      *
-     * @param max 最后的值为max - 1
+     * @param max 上界，不包含该值
+     * @return 顺序整数列表；{@code max <= 0} 时返回空列表
      */
     public static ArrayList<Integer> getOrderedIntegers(int max) {
         return IntStream.range(0, max)
@@ -52,7 +73,13 @@ public class QRArrayUtils {
     }
 
     /**
-     * 字符串结合单位乱序算法
+     * 返回一个乱序后的字符串数组。
+     * <p>
+     * 算法会尽量避免元素停留在原下标位置；只有一个元素时直接返回原数组。
+     * 返回的新数组元素来自原数组，但不会修改原数组内容。
+     *
+     * @param str 原字符串数组
+     * @return 乱序后的字符串数组
      */
     public static String[] getRandomPhrase(String[] str) {
         if (str.length == 1) {
@@ -65,7 +92,15 @@ public class QRArrayUtils {
                 .toArray(QRStringUtils.ARR_EMPTY);
     }
 
-
+    /**
+     * 返回一个乱序后的对象数组。
+     * <p>
+     * 先把列表转成数组，再使用和 {@link #getRandomPhrase(String[])} 相同的乱序策略。
+     * 只有一个元素时直接返回该元素数组。
+     *
+     * @param list 原列表
+     * @return 乱序后的对象数组
+     */
     public static Object[] getRandomObject(List<?> list) {
         Object[] objects = list.toArray(new Object[0]);
         if (list.size() == 1) {
@@ -101,10 +136,14 @@ public class QRArrayUtils {
     }
 
     /**
-     * 将字符串按指定的长度进行分割
+     * 将字符串按固定字符数切分。
+     * <p>
+     * 本方法按 Java {@code char} 计数，不按 Unicode 码点计数；如果文本包含代理对字符，
+     * 可能会被拆开。最后一段长度不足 {@code len} 时也会保留。
      *
-     * @param str 字符串
-     * @param len 指定长度
+     * @param str 待切分字符串
+     * @param len 每段字符数
+     * @return 切分后的字符串列表
      */
     public static LinkedList<String> splitWithLength(String str, int len) {
         char[] ch = str.toCharArray();
@@ -128,10 +167,14 @@ public class QRArrayUtils {
     }
 
     /**
-     * 将英文文本按指定长度不分割单词地进行拆分
+     * 将英文文本按近似长度切分，并尽量不拆开单词。
+     * <p>
+     * 方法先按空格分词，再逐词累加；当前段长度超过 {@code len} 后才收段，
+     * 因此返回段落长度可能略大于 {@code len}。适合把长英文句子分成多行展示。
      *
-     * @param englishText 文本
-     * @param len         长度
+     * @param englishText 英文文本
+     * @param len         每段目标长度
+     * @return 切分后的文本段
      */
     public static LinkedList<String> splitWithLengthEnglish(String englishText, int len) {
         StringBuilder sb = new StringBuilder();
@@ -151,7 +194,14 @@ public class QRArrayUtils {
     }
 
     /**
-     * 将字符串切割后转为int数组
+     * 按指定字符切分字符串，并把可识别的数字段转换为 {@link Integer} 数组。
+     * <p>
+     * 不能通过 {@link QRStringUtils#isNumber(String...)} 校验的片段会被忽略。
+     * 本方法不会抛出非数字片段错误。
+     *
+     * @param str  待切分字符串，例如 {@code "1,2,a,3"}
+     * @param mark 分隔字符
+     * @return 转换后的 Integer 数组，例如 {@code [1, 2, 3]}
      */
     public static Integer[] splitToInteger(String str, char mark) {
         char[] ch = str.toCharArray();
@@ -175,6 +225,16 @@ public class QRArrayUtils {
         return arr.toArray(new Integer[0]);
     }
 
+    /**
+     * 按指定字符切分字符串，并把可识别的数字段转换为 {@code int[]}。
+     * <p>
+     * 分隔符前的数字段会先 {@code trim()}，最后一段当前实现不做 {@code trim()}；
+     * 如果末段可能带空格，调用方应先处理输入。
+     *
+     * @param str  待切分字符串
+     * @param mark 分隔字符
+     * @return 转换后的 int 数组
+     */
     public static int[] splitToInt(String str, char mark) {
         char[] ch = str.toCharArray();
         StringBuilder sb = new StringBuilder();
@@ -197,6 +257,15 @@ public class QRArrayUtils {
         return listToArr(arr);
     }
 
+    /**
+     * 拼接两个 byte 数组。
+     * <p>
+     * 返回新数组，原数组不会被修改。两个参数都不能为 {@code null}。
+     *
+     * @param a 前半部分字节
+     * @param b 后半部分字节
+     * @return 拼接后的新数组
+     */
     public static byte[] arrayContact(byte[] a, byte[] b) {
         int zero = 0;
         byte[] c = new byte[a.length + b.length];
@@ -234,6 +303,16 @@ public class QRArrayUtils {
         return new String(chars);
     }
 
+    /**
+     * 替换字符数组中的所有指定字符。
+     * <p>
+     * 注意：本方法会直接修改传入的 {@code chars} 数组，并返回同一个数组引用。
+     *
+     * @param chars       待修改字符数组
+     * @param findChar    要查找的字符
+     * @param replaceChar 替换后的字符
+     * @return 修改后的原数组
+     */
     public static char[] charReplaceAll(final char[] chars, char findChar, char replaceChar) {
         for (int i = 0, charsLength = chars.length; i < charsLength; i++) {
             char aChar = chars[i];
@@ -245,7 +324,15 @@ public class QRArrayUtils {
     }
 
     /**
-     * 从指定的byte数组中，搜索指定字符串编码解码后的byte数组，并返回位置
+     * 在 byte 数组中查找指定字符串按给定字符集编码后的起始位置。
+     * <p>
+     * 搜索过程从数组尾部向前匹配，因此当内容出现多次时返回最后一次出现的位置。
+     * 未找到时返回 {@code -1}。
+     *
+     * @param b         待搜索字节数组
+     * @param searchStr 待查找字符串
+     * @param charset   字符串编码
+     * @return 匹配字节序列的起始下标，未找到返回 {@code -1}
      */
     public static int byteIndex(byte[] b, String searchStr, Charset charset) {
         byte[] mark = searchStr.getBytes(charset);
@@ -270,6 +357,14 @@ public class QRArrayUtils {
         return -1;
     }
 
+    /**
+     * 统计字符串数组中所有元素的字符总数。
+     * <p>
+     * 数组为 {@code null} 或空数组时返回 {@code -1}。数组元素不能为 {@code null}。
+     *
+     * @param arr 字符串数组
+     * @return 所有字符串长度之和
+     */
     public static int getStringArrayLength(String[] arr) {
         if (arr == null || arr.length == 0) {
             return -1;
@@ -281,6 +376,17 @@ public class QRArrayUtils {
         return length;
     }
 
+    /**
+     * 从字符串数组拼接视角截取一段文本。
+     * <p>
+     * 方法从 {@code startIndex} 对应元素开始向后拼接，直到累计长度达到
+     * {@code cutLength}。适合在“已按词或行拆分”的数组中取固定长度预览文本。
+     *
+     * @param arr        字符串数组
+     * @param startIndex 开始元素下标
+     * @param cutLength  最多截取的字符数
+     * @return 截取后的字符串
+     */
     public static String getArraySubstring(String[] arr, int startIndex, int cutLength) {
         StringBuilder sb = new StringBuilder();
         int length = 0;
@@ -299,7 +405,13 @@ public class QRArrayUtils {
     }
 
     /**
-     * 数组逆序算法，取自commons
+     * 原地反转字符串数组。
+     * <p>
+     * 算法取自 commons 思路。传入 {@code null} 时返回 {@code null}；
+     * 非空数组会被直接修改，并返回同一个数组引用。
+     *
+     * @param array 待反转数组
+     * @return 反转后的原数组引用
      */
     public static String[] reverse(final String[] array) {
         if (array == null) {
@@ -318,6 +430,14 @@ public class QRArrayUtils {
         return array;
     }
 
+    /**
+     * 将整数集合转换为 {@code int[]}。
+     * <p>
+     * 集合中不能包含 {@code null}，否则拆箱时会抛出异常。
+     *
+     * @param l 整数集合
+     * @return int 数组
+     */
     public static int[] listToArr(Collection<Integer> l) {
         final Integer[] array = l.toArray(new Integer[0]);
         return Arrays.stream(array).mapToInt(integer -> integer).toArray();
@@ -333,6 +453,12 @@ public class QRArrayUtils {
         return Arrays.stream(array).mapToInt(integer -> integer).toArray();
     }
 
+    /**
+     * 将字符串列表转换为字符串数组。
+     *
+     * @param list 字符串列表
+     * @return 字符串数组
+     */
     public static String[] stringListToArr(List<String> list) {
         return list.toArray(QRStringUtils.ARR_EMPTY);
     }
@@ -562,7 +688,10 @@ public class QRArrayUtils {
     }
 
     /**
-     * 是否为空或含有空
+     * 判断数组本身是否为 {@code null}，或数组中是否包含 {@code null} 元素。
+     *
+     * @param arr 待检查数组
+     * @return 数组为 null 或包含 null 元素时返回 {@code true}
      */
     public static boolean isNullOrContainsNull(Object[] arr) {
         if (arr == null) {

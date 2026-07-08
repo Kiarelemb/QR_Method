@@ -15,8 +15,19 @@ public class QRPropertiesUtils {
 
 
 	/**
-	 * 加载资源文件。
-	 * 注意，该方法非原生读取方法，而是自定义的读取方法
+	 * 加载属性文件。
+	 * <p>
+	 * 注意：该方法非 {@link Properties#load(InputStream)} 原生语法，而是本项目的轻量解析：
+	 * 使用 UTF-8 按行读取；整行以 {@code !} 开头会被忽略；行内 {@code #} 后的内容会被当作注释删除；
+	 * 仅当一行按 {@code =} 拆分后刚好得到两个字段时才写入 {@code prop}。
+	 * 因此 value 中不能直接包含额外的 {@code =}。
+	 * <p>
+	 * 使用例：
+	 * <pre>{@code
+	 * Properties prop = new Properties();
+	 * QRPropertiesUtils.loadProp(prop, "res/settings/window.properties");
+	 * int width = QRPropertiesUtils.getPropInInteger(prop, "window.width", 1280, true);
+	 * }</pre>
 	 *
 	 * @param prop 已实例化的资源文件变量
 	 * @param path 该资源文件的保存路径
@@ -38,8 +49,11 @@ public class QRPropertiesUtils {
 
 
 	/**
-	 * 保存资源文件。
-	 * 注意，该方法非原生保存方法，而是自定义的保存方法
+	 * 以本项目的简洁格式保存属性文件。
+	 * <p>
+	 * 每个属性会保存为一行 {@code key=value}，不写入时间戳、转义字符或 Unicode 转义。
+	 * 写入使用 UTF-8，并通过 {@link QRFileUtils#fileWriterWithUTF8(String, java.util.List)}
+	 * 覆盖原文件。
 	 *
 	 * @param prop 已实例化的资源文件变量
 	 * @param path 该资源文件的保存路径
@@ -142,7 +156,10 @@ public class QRPropertiesUtils {
 	}
 
 	/**
-	 * 传入Properties与key值，将结果转为int值
+	 * 读取整数属性，缺失或不是数字时返回默认值。
+	 * <p>
+	 * {@code nullSet} 为 {@code true} 且 key 不存在时，会把默认值写回到传入的
+	 * {@link Properties} 对象中；本方法不会自动持久化到文件，需要调用方再执行保存。
 	 */
 	public static int getPropInInteger(Properties prop, String key) {
 		return getPropInInteger(prop, key, 0);

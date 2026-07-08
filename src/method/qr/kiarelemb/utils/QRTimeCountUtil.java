@@ -28,6 +28,21 @@ public class QRTimeCountUtil {
 		mmm = mm;
 	}
 
+	/**
+	 * 创建一个耗时统计器。
+	 * <p>
+	 * 对象创建时间会作为总耗时起点；{@link #startTimeUpdate()} 或 {@link #getAndUpdate()}
+	 * 会更新阶段耗时起点。常见用法是流程开始时创建一个实例，中间阶段调用
+	 * {@code startTimeUpdate()}，结束时调用 {@link #endAndGet()} 或 {@link #endAndGetTotal()}。
+	 * <pre>{@code
+	 * QRTimeCountUtil time = new QRTimeCountUtil();
+	 * loadConfig();
+	 * time.startTimeUpdate();
+	 * loadImages();
+	 * logger.info(time.endAndGet("图片加载"));
+	 * logger.info(time.endAndGetTotal("启动"));
+	 * }</pre>
+	 */
 	public QRTimeCountUtil() {
 		this.totalStartTime = System.currentTimeMillis();
 		this.startTime = this.totalStartTime;
@@ -85,6 +100,11 @@ public class QRTimeCountUtil {
 		return System.currentTimeMillis() - startTime;
 	}
 
+	/**
+	 * 获取距离上一次阶段起点的毫秒数，并把当前时间设为新的阶段起点。
+	 *
+	 * @return 阶段耗时，单位毫秒
+	 */
 	public long getAndUpdate() {
 		final long currentTimeMillis = System.currentTimeMillis();
 		long diff = currentTimeMillis - startTime;
@@ -102,16 +122,31 @@ public class QRTimeCountUtil {
 		startTimeUpdated = true;
 	}
 
+	/**
+	 * 判断距离阶段起点是否已经超过 {@link #min()} 分钟。
+	 *
+	 * @return 超过阈值时返回 {@code true}
+	 */
 	public boolean isPassedLongTime() {
 		final long now = System.currentTimeMillis();
 		return (now - startTime) / (60 * 1000) > min;
 	}
 
+	/**
+	 * 判断距离阶段起点是否已经超过 {@link #sec()} 秒。
+	 *
+	 * @return 超过阈值时返回 {@code true}
+	 */
 	public boolean isPassedSecTime() {
 		final long now = System.currentTimeMillis();
 		return (now - startTime) / 1000 > sec;
 	}
 
+	/**
+	 * 判断距离阶段起点是否已经超过 {@link #mmm()} 毫秒。
+	 *
+	 * @return 超过阈值时返回 {@code true}
+	 */
 	public boolean isPassedMmTime() {
 		final long now = System.currentTimeMillis();
 		return (now - startTime) > mmm;

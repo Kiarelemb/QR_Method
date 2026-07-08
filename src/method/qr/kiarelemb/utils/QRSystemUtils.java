@@ -45,6 +45,14 @@ public class QRSystemUtils {
         }
     }
 
+    /**
+     * 获取更适合展示和日志记录的操作系统名称。
+     * <p>
+     * Windows/macOS 直接使用 {@code os.name}。Linux 会优先读取 {@code /etc/os-release}，
+     * 尝试拼出发行版名称和版本号；读取失败时退回 {@code os.name}。
+     *
+     * @return 系统名称，例如 {@code Windows 10}、{@code Ubuntu 22.04}
+     */
     public static String getSystemName() {
         Properties props = System.getProperties();
         String name = props.getProperty("os.name");
@@ -127,6 +135,13 @@ public class QRSystemUtils {
         }
     }
 
+    /**
+     * 获取当前系统进程列表。
+     * <p>
+     * 返回值来自 JProcesses 的 fastMode，适合做进程名、PID 等轻量检查。
+     *
+     * @return 进程信息列表
+     */
     public static List<ProcessInfo> getSystemProcessInfo() {
         return JProcesses.get().fastMode().listProcesses();
     }
@@ -201,6 +216,13 @@ public class QRSystemUtils {
         return result.toString().trim();
     }
 
+    /**
+     * 获取屏幕尺寸并缓存为 {@code [width, height]}。
+     * <p>
+     * 如果需要每次读取最新尺寸，请使用 {@link #screenSize()}。
+     *
+     * @return 宽高数组，索引 0 为宽度，索引 1 为高度
+     */
     public static int[] getScreenSize() {
         if (screenSize == null) {
             screenSize = new int[2];

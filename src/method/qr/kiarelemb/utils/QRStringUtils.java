@@ -280,7 +280,15 @@ public class QRStringUtils {
     }
 
     /**
-     * 这个算法来自StringUtils，略改，非个人编写
+     * 使用指定分隔符拼接字符串数组。
+     * <p>
+     * {@code null} 数组或空数组会返回空字符串；数组中的 {@code null} 元素会被跳过内容，
+     * 但仍然保留它所在位置前的分隔符。该行为和 Apache Commons Lang 的部分实现接近，
+     * 适合写文件、展示列表等简单拼接场景。
+     *
+     * @param array     待拼接数组
+     * @param separator 分隔符，例如 {@code "\n"} 或 {@code ","}
+     * @return 拼接后的字符串
      */
     public static String join(final String[] array, String separator) {
         if (array == null || array.length == 0) {
@@ -300,6 +308,17 @@ public class QRStringUtils {
         return buf.toString();
     }
 
+    /**
+     * 使用指定分隔符拼接集合。
+     * <p>
+     * 集合为空时当前实现会因 {@code substring} 抛出异常，调用方应先判断非空。
+     * 集合本身无序时，拼接结果顺序也不稳定；需要稳定顺序时请传入 {@link List}
+     * 或使用有序集合。
+     *
+     * @param array     待拼接集合
+     * @param separator 分隔符
+     * @return 拼接后的字符串
+     */
     public static String join(final Set<String> array, String separator) {
         final StringBuilder buf = new StringBuilder(getStringArrLen(array));
         for (String s : array) {
@@ -310,6 +329,17 @@ public class QRStringUtils {
         return buf.substring(separator.length());
     }
 
+    /**
+     * 使用指定分隔符拼接列表。
+     * <p>
+     * 列表为空时当前实现会因 {@code substring} 抛出异常，调用方应先判断非空。
+     * 高频用法是配合 {@link QRFileUtils#fileWriterWithUTF8(String, java.util.List)}
+     * 将多行内容写入文件。
+     *
+     * @param array     待拼接列表
+     * @param separator 分隔符
+     * @return 拼接后的字符串
+     */
     public static String join(final List<String> array, String separator) {
         final StringBuilder buf = new StringBuilder(getStringArrLen(array));
         for (String s : array) {
@@ -474,10 +504,34 @@ public class QRStringUtils {
         return num / split.length >= count;
     }
 
+    /**
+     * 按第一次出现的分隔字符把字符串拆成两段。
+     * <p>
+     * 返回数组固定长度为 2。只会在第一次遇到 {@code splitChar} 时切分，后续同字符会留在第二段中。
+     * 这很适合解析 {@code key=value} 配置行，避免 value 中再次出现等号时被继续拆开。
+     * <p>
+     * 使用例：
+     * <pre>{@code
+     * String[] kv = QRStringUtils.stringSplit("path=/a=b/c", '=', true);
+     * // kv[0] = "path"; kv[1] = "/a=b/c"
+     * }</pre>
+     *
+     * @param lineText  待拆分字符串
+     * @param splitChar 分隔字符
+     * @return 长度为 2 的数组，未找到分隔符时第 0 项为 null，第 1 项为原文本
+     */
     public static String[] stringSplit(String lineText, char splitChar) {
         return stringSplit(lineText, splitChar, false);
     }
 
+    /**
+     * 按第一次出现的分隔字符把字符串拆成两段，并可选择去除两端空白。
+     *
+     * @param lineText  待拆分字符串，方法会先整体 {@code trim()}
+     * @param splitChar 分隔字符
+     * @param trimStr   是否对拆出的两段分别 {@code trim()}
+     * @return 长度为 2 的数组，未找到分隔符时第 0 项为 null
+     */
     public static String[] stringSplit(String lineText, char splitChar, boolean trimStr) {
         StringBuilder sb = new StringBuilder();
         String[] s = new String[2];
@@ -1085,6 +1139,16 @@ public class QRStringUtils {
         return Pattern.compile(regex).matcher(str).matches();
     }
 
+    /**
+     * 提取字符串中的所有数字字符并转成整数。
+     * <p>
+     * 常用于从系统版本字符串中取版本号，例如 {@code "Windows 10" -> 10}。
+     * 如果参数为 {@code null}、空白字符串，或字符串中没有任何数字，都会抛出
+     * {@link NumberFormatException}。
+     *
+     * @param str 待提取字符串
+     * @return 所有数字字符按原顺序组成的整数
+     */
     public static int pickNumber(String str){
         if (str == null || str.isBlank()) {
             throw new NumberFormatException(str);
@@ -1833,9 +1897,28 @@ public class QRStringUtils {
     //region KeyEvent, KeyStroke, String
 
     /**
-     * 返回格式为：{@code 86+130}、{@code 86}
+     * 将 {@link KeyStroke} 转为可用于快捷键注册、查找的稳定字符串值。
+     * <p>
+     * 返回格式为：{@code 86+130}、{@code 86}。前半部分是 {@link KeyStroke#getKeyCode()}，
+     * 后半部分是 {@link KeyStroke#getModifiers()}。没有修饰键时只返回 keyCode。
+     * <p>
+     * 使用例：
+     * <pre>{@code
+     * KeyStroke ctrlS = KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK);
+     * String value = QRStringUtils.getKeyStrokeValue(ctrlS); // "83+130"
+     * }</pre>
+     * 注意：
+     * <ul>
+     *     <li>{@code null} 会返回 {@code null}，调用方可直接跳过不可识别按键。</li>
+     *     <li>组合键保留 {@link KeyStroke#getModifiers()} 的值，和 Swing 注册快捷键时的编码保持一致。</li>
+     *     <li>{@link KeyEvent#KEY_TYPED} 类型的 {@code KeyStroke} 通常没有普通 keyCode，
+     *     不适合用本方法做字符级匹配；字符输入请使用 {@link #getKeyTypedValue(KeyStroke)}。</li>
+     * </ul>
      */
     public static String getKeyStrokeValue(KeyStroke key) {
+        if (key == null) {
+            return null;
+        }
         int modifiers = key.getModifiers();
         String modifiersExText = InputEvent.getModifiersExText(modifiers);
         if (modifiersExText.isEmpty()) {
@@ -1846,65 +1929,177 @@ public class QRStringUtils {
     }
 
     /**
-     * 返回格式为：{@code 86+130}、{@code 86}
+     * 将 {@link KeyEvent} 转为和 {@link #getKeyStrokeValue(KeyStroke)} 一致的快捷键匹配值。
+     * <p>
+     * 返回格式为：{@code 86+130}、{@code 86}。本方法会先通过 {@link #getKeyStroke(KeyEvent)}
+     * 转成 {@link KeyStroke}，再复用 {@link #getKeyStrokeValue(KeyStroke)}。
+     * 这样可以避免 {@link KeyEvent#getModifiersEx()} 和 {@link KeyStroke#getModifiers()}
+     * 在 Ctrl、Shift 等修饰键编码上的差异。
+     * <p>
+     * 使用例：
+     * <pre>{@code
+     * KeyStroke registered = KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK);
+     * KeyEvent pressed = ...; // Ctrl + S 的 KEY_PRESSED 事件
+     *
+     * QRStringUtils.getKeyStrokeValue(registered)
+     *         .equals(QRStringUtils.getKeyStrokeValue(pressed)); // true
+     * }</pre>
+     * 注意：{@code null} 会返回 {@code null}。
      */
     public static String getKeyStrokeValue(KeyEvent key) {
-        int modifiers = key.getModifiersEx();
-        String modifiersExText = InputEvent.getModifiersExText(modifiers);
-        if (modifiersExText.isEmpty()) {
-            return String.valueOf(key.getKeyCode());
-        } else {
-            return key.getKeyCode() + "+" + modifiers;
+        if (key == null) {
+            return null;
         }
+        return getKeyStrokeValue(getKeyStroke(key));
     }
 
     /**
-     * 返回格式为：{@code Ctrl + Alt + Shift + S}、{@code F12}
+     * 返回 {@link KeyEvent#KEY_TYPED} 的专用匹配值。
+     * <p>
+     * 普通按键值使用 keyCode；但 typed 事件的 {@link KeyStroke#getKeyCode()} 通常是
+     * {@link KeyEvent#VK_UNDEFINED}，也就是 {@code 0}。如果继续使用
+     * {@link #getKeyStrokeValue(KeyStroke)}，不同 typed 字符会冲突。
+     * 本方法用 {@code typed:字符+修饰键} 的形式表达字符输入。
+     * <p>
+     * 使用例：
+     * <pre>{@code
+     * KeyStroke typedA = KeyStroke.getKeyStroke('a');
+     * String value = QRStringUtils.getKeyTypedValue(typedA); // "typed:a+0"
+     * }</pre>
+     * 注意：
+     * <ul>
+     *     <li>{@code null} 会返回 {@code null}。</li>
+     *     <li>不是 {@link KeyEvent#KEY_TYPED} 类型的 {@code KeyStroke} 会返回 {@code null}。</li>
+     *     <li>组合键、功能键等快捷键过滤仍建议使用 {@link #getKeyStrokeValue(KeyStroke)}。</li>
+     * </ul>
+     */
+    public static String getKeyTypedValue(KeyStroke key) {
+        if (key == null || key.getKeyEventType() != KeyEvent.KEY_TYPED) {
+            return null;
+        }
+        return "typed:" + key.getKeyChar() + "+" + key.getModifiers();
+    }
+
+    /**
+     * 返回 {@link KeyEvent#KEY_TYPED} 的专用匹配值。
+     * <p>
+     * 和 {@link #getKeyTypedValue(KeyStroke)} 对应，用于从真实的键盘 typed 事件中得到字符级匹配值。
+     * <p>
+     * 使用例：
+     * <pre>{@code
+     * KeyEvent typed = ...; // KEY_TYPED，keyChar 为 'a'
+     * String value = QRStringUtils.getKeyTypedValue(typed); // "typed:a+0"
+     * }</pre>
+     * 注意：
+     * <ul>
+     *     <li>{@code null} 会返回 {@code null}。</li>
+     *     <li>事件 ID 不是 {@link KeyEvent#KEY_TYPED} 时返回 {@code null}。</li>
+     *     <li>修饰键使用 {@link KeyEvent#getModifiersEx()}，即扩展 mask。</li>
+     * </ul>
+     */
+    public static String getKeyTypedValue(KeyEvent key) {
+        if (key == null || key.getID() != KeyEvent.KEY_TYPED) {
+            return null;
+        }
+        return "typed:" + key.getKeyChar() + "+" + key.getModifiersEx();
+    }
+
+    /**
+     * 将 {@link KeyStroke} 转成适合显示给用户看的快捷键文本。
+     * <p>
+     * 返回格式为：{@code Ctrl + Alt + Shift + S}、{@code F12}、{@code Space}。
+     * 该文本用于展示，不用于反序列化或区分 pressed/released/typed 事件阶段。
+     * <p>
+     * 使用例：
+     * <pre>{@code
+     * KeyStroke ctrlS = QRStringUtils.getKeyStroke("Ctrl + S");
+     * String text = QRStringUtils.getKeyStrokeString(ctrlS); // "Ctrl + S"
+     * }</pre>
+     * 注意：
+     * <ul>
+     *     <li>{@code null} 会返回 {@code null}。</li>
+     *     <li>typed 事件会使用 {@link KeyStroke#getKeyChar()}，并转为大写展示。</li>
+     *     <li>pressed/released 事件会使用 {@link KeyEvent#getKeyText(int)} 显示 keyCode。</li>
+     *     <li>修饰键文本来自 {@link InputEvent#getModifiersExText(int)}，因此能覆盖 Ctrl、Alt、Shift、Meta、AltGraph 等情况。</li>
+     * </ul>
      */
     public static String getKeyStrokeString(KeyStroke key) {
-        String str = key.toString();
-        String letters = QRStringUtils.captureName(str.substring(str.lastIndexOf(QRStringUtils.A_WHITE_SPACE) + 1));
-        if (str.startsWith("pressed") || str.startsWith("typed") || str.startsWith("released")) {
-            return letters;
-//			return String.valueOf(key.getKeyCode());
-        } else {
-            String modifiers = InputEvent.getModifiersExText(key.getModifiers()).replaceAll("\\+", " + ");
-            return modifiers + " + " + letters;
-//			return key.getModifiers() + "+" + key.getKeyCode();
+        if (key == null) {
+            return null;
         }
+        String keyText;
+        if (key.getKeyEventType() == KeyEvent.KEY_TYPED) {
+            keyText = String.valueOf(key.getKeyChar()).toUpperCase(Locale.ROOT);
+        } else {
+            keyText = KeyEvent.getKeyText(key.getKeyCode());
+        }
+        String modifiers = InputEvent.getModifiersExText(key.getModifiers()).replace("+", " + ");
+        return modifiers.isEmpty() ? keyText : modifiers + " + " + keyText;
     }
 
     /**
-     * 返回格式为：{@code Ctrl + Alt + Shift + S}、{@code F12}
+     * 将 {@link KeyEvent} 转成适合显示给用户看的快捷键文本。
+     * <p>
+     * 返回格式为：{@code Ctrl + Alt + Shift + S}、{@code F12}。本方法会先转为
+     * {@link KeyStroke}，再复用 {@link #getKeyStrokeString(KeyStroke)}，避免遗漏 Meta、
+     * AltGraph 等修饰键。
+     * <p>
+     * 使用例：
+     * <pre>{@code
+     * KeyEvent pressed = ...; // Ctrl + S 的 KEY_PRESSED 事件
+     * String text = QRStringUtils.getKeyEventString(pressed); // "Ctrl + S"
+     * }</pre>
+     * 注意：{@code null} 会返回 {@code null}。
      */
     public static String getKeyEventString(KeyEvent e) {
-        StringBuilder sb = new StringBuilder();
-        int keyCode = e.getKeyCode();
-        if (e.isControlDown() || e.isAltDown() || e.isShiftDown()) {
-            sb = new StringBuilder();
-            if (e.isControlDown()) {
-                sb.append("Ctrl").append(" + ");
-            }
-            if (e.isAltDown()) {
-                sb.append("Alt").append(" + ");
-            }
-            if (e.isShiftDown()) {
-                sb.append("Shift").append(" + ");
-            }
+        if (e == null) {
+            return null;
         }
-        if (keyCode > 18 || keyCode == 10) {
-            sb.append(KeyEvent.getKeyText(keyCode));
-        } else {
-            return sb.substring(0, sb.lastIndexOf("+") - 1);
-        }
-        return sb.toString();
+        return getKeyStrokeString(getKeyStroke(e));
     }
 
+    /**
+     * 将键盘事件转为对应的 {@link KeyStroke}。
+     * <p>
+     * 使用例：
+     * <pre>{@code
+     * KeyEvent pressed = ...; // Ctrl + S 的 KEY_PRESSED 事件
+     * KeyStroke keyStroke = QRStringUtils.getKeyStroke(pressed);
+     * }</pre>
+     * 注意：
+     * <ul>
+     *     <li>{@code null} 会返回 {@code null}。</li>
+     *     <li>修饰键使用 {@link KeyEvent#getModifiersEx()}，用于描述当前事件中按下的扩展修饰键。</li>
+     *     <li>本方法主要面向 pressed/released 快捷键匹配；typed 字符匹配请使用 {@link #getKeyTypedValue(KeyEvent)}。</li>
+     * </ul>
+     */
     public static KeyStroke getKeyStroke(KeyEvent e) {
+        if (e == null) {
+            return null;
+        }
         return KeyStroke.getKeyStroke(e.getKeyCode(), e.getModifiersEx());
     }
 
+    /**
+     * 通过整数参数构造 {@link KeyStroke}。
+     * <p>
+     * 支持两种形式：
+     * <pre>{@code
+     * QRStringUtils.getKeyStroke(KeyEvent.VK_S); // 无修饰键的 S
+     * QRStringUtils.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK); // Ctrl + S
+     * }</pre>
+     * 注意：
+     * <ul>
+     *     <li>{@code values == null} 会返回 {@code null}。</li>
+     *     <li>传入 1 个值时，第一个值是 keyCode，修饰键为 0。</li>
+     *     <li>传入 2 个值时，第一个值是 keyCode，第二个值是 modifiers。</li>
+     *     <li>其它参数个数无法明确表达含义，会返回 {@code null}。</li>
+     * </ul>
+     */
     public static KeyStroke getKeyStroke(int... values) {
+        if (values == null) {
+            return null;
+        }
         if (values.length == 1) {
             return KeyStroke.getKeyStroke(values[0], 0);
         } else if (values.length == 2) {
@@ -1914,44 +2109,88 @@ public class QRStringUtils {
     }
 
     /**
-     * 有+号则优先以+号分割，再以空格分割
-     * <p>支持格式{@code Ctrl + Alt + Shift + s}、{@code a}、{@code shift a}
+     * 将用户输入的快捷键字符串解析为 {@link KeyStroke}。
+     * <p>
+     * 有 {@code +} 号时优先按 {@code +} 分割，否则按空格分割。支持大小写混写，
+     * 最后一个 token 作为主按键，前面的 token 作为修饰键。
+     * <p>
+     * 支持格式示例：
+     * <pre>{@code
+     * QRStringUtils.getKeyStroke("Ctrl + Alt + Shift + S");
+     * QRStringUtils.getKeyStroke("shift b");
+     * QRStringUtils.getKeyStroke("meta S");
+     * QRStringUtils.getKeyStroke("altGraph S");
+     * QRStringUtils.getKeyStroke(" ");          // Space
+     * QRStringUtils.getKeyStroke("\t");         // Tab
+     * QRStringUtils.getKeyStroke("+");          // Plus
+     * QRStringUtils.getKeyStroke("Ctrl + +");   // Ctrl + Plus
+     * QRStringUtils.getKeyStroke(" Ctrl + S "); // 自动 trim
+     * }</pre>
+     * 代码中特别处理的情况：
+     * <ul>
+     *     <li>{@code null} 返回 {@code null}。</li>
+     *     <li>单独一个普通空格不能先 {@code trim()}，否则会变成空串；因此直接解析为 {@link KeyEvent#VK_SPACE}。</li>
+     *     <li>单独一个 Tab 也不能先 {@code trim()}，因此直接解析为 {@link KeyEvent#VK_TAB}。</li>
+     *     <li>首尾空白会在空格和 Tab 的特殊判断之后再清理；清理后为空串则返回 {@code null}。</li>
+     *     <li>{@code "+"} 和 {@code "plus"} 会解析为 {@link KeyEvent#VK_PLUS}。</li>
+     *     <li>以 {@code +} 结尾时，例如 {@code "Ctrl + +"}，最后一个 {@code +} 是主按键而不是分隔符，
+     *     因此会先替换为 {@code PLUS} 再继续解析。</li>
+     *     <li>优先尝试 Swing 原生的 {@link KeyStroke#getKeyStroke(String)}；原生解析失败后再做宽松格式兼容。</li>
+     * </ul>
      */
     public static KeyStroke getKeyStroke(String str) {
-        if (str != null) {
-            KeyStroke keyStroke = KeyStroke.getKeyStroke(str.replace("\t", "TAB"));
-            if (keyStroke != null) {
-                return keyStroke;
-            }
-            if (str.endsWith("+")) {
-                char[] chars = str.toCharArray();
-                chars[chars.length - 1] = '\u200B';
-                str = new String(chars);
-            }
-            if (str.equals(" ")) {
-                return KeyStroke.getKeyStroke("space8");
-            }
-            if (str.contains(" ") || str.contains("+")) {
-                String[] split = str.contains("+") ? str.split("\\+") : str.replaceAll(" {2,}", " ").split(" ");
-                int length = split.length;
-                if (length > 0) {
-                    for (int i = 0; i < length - 1; i++) {
-                        split[i] = split[i].trim().toLowerCase(Locale.ROOT);
-                    }
-                    if (split[length - 1].charAt(0) == '\u200B') {
-                        split[length - 1] = "+";
-                    } else if (split[length - 1].charAt(0) == '\u200C') {
-                        split[length - 1] = " ";
-                    } else {
-                        split[length - 1] = split[length - 1].trim().toUpperCase(Locale.ROOT);
-                    }
-                    return KeyStroke.getKeyStroke(String.join(" ", split));
+        if (str == null) {
+            return null;
+        }
+        if (str.equals(" ")) {
+            return KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0);
+        }
+        if (str.equals("\t")) {
+            return KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0);
+        }
+        str = str.trim();
+        if (str.isEmpty()) {
+            return null;
+        }
+        if (str.equals("+") || str.equalsIgnoreCase("plus")) {
+            return KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, 0);
+        }
+        if (str.endsWith("+")) {
+            str = str.substring(0, str.length() - 1) + "PLUS";
+        }
+        KeyStroke keyStroke = KeyStroke.getKeyStroke(str.replace("\t", "TAB"));
+        if (keyStroke != null) {
+            return keyStroke;
+        }
+        if (str.contains(" ") || str.contains("+")) {
+            String[] split = str.contains("+") ? str.split("\\+", -1) : str.replaceAll(" {2,}", " ").split(" ");
+            int length = split.length;
+            if (length > 0) {
+                for (int i = 0; i < length - 1; i++) {
+                    split[i] = split[i].trim().toLowerCase(Locale.ROOT);
                 }
-            } else {
-                return KeyStroke.getKeyStroke(str.toUpperCase(Locale.ROOT));
+                split[length - 1] = keyStrokeText(split[length - 1]);
+                if (split[length - 1].isEmpty()) {
+                    return null;
+                }
+                return KeyStroke.getKeyStroke(String.join(" ", split));
             }
         }
-        return null;
+        return KeyStroke.getKeyStroke(keyStrokeText(str));
+    }
+
+    /**
+     * 将主按键 token 规范化为 Swing 可识别的 key 文本。
+     * <p>
+     * 普通按键统一转大写，例如 {@code s -> S}；{@code +} 和 {@code plus}
+     * 统一转成 {@code PLUS}，用于支持 {@code "+"}、{@code "Ctrl + +"} 等输入形式。
+     */
+    private static String keyStrokeText(String text) {
+        text = text.trim();
+        if (text.equals("+") || text.equalsIgnoreCase("plus")) {
+            return "PLUS";
+        }
+        return text.toUpperCase(Locale.ROOT);
     }
     //endregion
 }

@@ -26,6 +26,16 @@ public class QRFontUtils {
         return loadFontFromFile(size, fontFilePath);
     }
 
+    /**
+     * 从本地字体文件加载字体，并按字号返回可直接使用的 {@link Font}。
+     * <p>
+     * 字体会注册到本地 {@link GraphicsEnvironment}，并缓存到 {@link #FONT_MAP}。
+     * 后续同名字体会直接从缓存派生指定字号，避免重复读取字体文件。
+     *
+     * @param size         字号
+     * @param fontFilePath ttf 字体文件路径
+     * @return 加载成功的字体；失败时返回 {@code null}
+     */
     public static Font loadFontFromFile(int size, String fontFilePath) {
         return loadFontFromFile(size, new File(fontFilePath));
     }
@@ -70,6 +80,16 @@ public class QRFontUtils {
         return new Font("微软雅黑", Font.PLAIN, size);
     }
 
+    /**
+     * 获取指定字体族和字号的字体。
+     * <p>
+     * 如果字体之前通过本类加载过，会从缓存字体派生指定字号；否则直接构造系统字体并缓存。
+     * 调用方需要确认目标字体是否能显示业务文本，可配合 {@link #fontCanAllDisplay(String, Font)}。
+     *
+     * @param fontFamily 字体族名称
+     * @param size       字号
+     * @return 字体对象
+     */
     public static Font getFont(String fontFamily, int size) {
         if (FONT_MAP.containsKey(fontFamily)) {
             return FONT_MAP.get(fontFamily).deriveFont((float) size);
@@ -152,6 +172,14 @@ public class QRFontUtils {
         return font.canDisplayUpTo(str) == -1;
     }
 
+    /**
+     * 在系统字体列表中寻找第一个能完整显示指定字符串的字体。
+     * <p>
+     * 该方法会遍历系统全部字体，适合兜底选择字体，不适合在高频绘制路径中反复调用。
+     *
+     * @param str 待显示文本
+     * @return 第一个可完整显示文本的字体；找不到时返回 {@code null}
+     */
     public static Font getCanDisplayFont(String str) {
         String[] fontNames = getSystemFontNames();
         for (String systemFontName : fontNames) {

@@ -6,6 +6,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class QRMathUtils {
+	/**
+	 * 对 float 做四舍五入格式化。
+	 * <p>
+	 * 内部使用 {@link BigDecimal#setScale(int, RoundingMode)} 和 {@link RoundingMode#HALF_UP}，
+	 * 适合成绩、比例等展示层数值格式化。传入 NaN 或 Infinity 会抛出
+	 * {@link NumberFormatException}。
+	 *
+	 * @param d     待格式化数字
+	 * @param scale 保留小数位数
+	 * @return 格式化后的 float
+	 */
 	public static float floatFormat(float d, int scale) {
 		if (Float.isInfinite(d) || Float.isNaN(d)) {
 			throw new NumberFormatException("Infinite or NaN");
@@ -14,6 +25,12 @@ public class QRMathUtils {
 		return b.setScale(scale, RoundingMode.HALF_UP).floatValue();
 	}
 
+	/**
+	 * 对 double 保留两位小数，使用四舍五入。
+	 *
+	 * @param d 待格式化数字
+	 * @return 保留两位小数后的 double
+	 */
 	public static double doubleFormat(double d) {
 		if (Double.isInfinite(d) || Double.isNaN(d)) {
 			throw new NumberFormatException("Infinite or NaN");
@@ -44,6 +61,15 @@ public class QRMathUtils {
 		return (float) doubleFormat(b1.subtract(b2).doubleValue());
 	}
 
+	/**
+	 * 将较大的数量格式化为简短文本。
+	 * <p>
+	 * 大于 10000 时使用 {@code w}，大于 1000 时使用 {@code k}，小数部分向下截断到一位。
+	 * 例如 {@code 15320 -> "1.5w"}，{@code 1580 -> "1.5k"}。
+	 *
+	 * @param wordNum 数量
+	 * @return 简短展示文本
+	 */
 	public static String wordFormat(int wordNum) {
 		if (wordNum > 10000) {
 			return doubleFormat(wordNum / 10000d, 1, RoundingMode.DOWN) + "w";
